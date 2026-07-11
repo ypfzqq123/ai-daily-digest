@@ -126,10 +126,21 @@ def _generate_word(markdown: str, filepath: Path) -> None:
             i += 1
             continue
 
-        # Item title: - **[Title]**
+        # Item title: - **[label] description** or - **[label]**: description
         if line.startswith('- **['):
-            title_text = line.split('**[')[1].split(']**')[0]
-            subtitle = line.split(']**')[1].strip() if ']**' in line else ''
+            rest = line[2:].strip()
+            if rest.startswith('**'):
+                rest = rest[2:]
+            if rest.endswith('**'):
+                rest = rest[:-2]
+            rest = rest.strip()
+            m = re.match(r'\[([^\]]+)\]\s*(.*)', rest)
+            if m:
+                title_text = f'[{m.group(1)}]'
+                subtitle = m.group(2)
+            else:
+                title_text = rest
+                subtitle = ''
             p = doc.add_paragraph()
             p.style = doc.styles['List Bullet']
             run = p.add_run(title_text)
