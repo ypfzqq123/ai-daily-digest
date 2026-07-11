@@ -186,6 +186,11 @@ def fetch_rss_feed(feed_url, source_name, max_items=50, cutoff_days=3):
 
             title = entry.get("title", "")
             summary = entry.get("summary", entry.get("description", ""))
+
+            # Skip "早新闻" daily roundup items (duplicates of individual articles)
+            if "早新闻" in title:
+                continue
+
             category = classify_item(title, summary)
 
             items.append(make_item(
@@ -207,7 +212,7 @@ def fetch_rss_feed(feed_url, source_name, max_items=50, cutoff_days=3):
 # ── RSS sources ─────────────────────────────────────────────────────────────
 
 RSS_SOURCES = [
-    ("https://www.xindianti.cn/feed/rss.php?mid=21", "新电梯网", 50, 3),
+    ("https://www.xindianti.cn/feed/rss.php?mid=21", "新电梯网", 50, 7),
 ]
 
 

@@ -1057,6 +1057,25 @@ def weekday_of(date_str: str, lang: str = "zh") -> str:
         return ""
 
 
+def _is_weekly(date_str: str) -> bool:
+    """Check if date_str is a weekly range like 20260706-20260712."""
+    return '-' in date_str and len(date_str) > 10
+
+
+def _format_label(date_str: str) -> str:
+    """Format date or week range for display."""
+    if _is_weekly(date_str):
+        parts = date_str.split('-')
+        try:
+            start = datetime.strptime(parts[0], "%Y%m%d")
+            end = datetime.strptime(parts[1], "%Y%m%d")
+            return f"周报 {start.strftime('%m/%d')}-{end.strftime('%m/%d')}"
+        except Exception:
+            return date_str
+    wd = weekday_of(date_str)
+    return f"{wd} · {date_str}" if wd else date_str
+
+
 def state_script(dates: list[str], current: str | None,
                  prev_date: str | None, next_date: str | None, base: str) -> str:
     parts = [
@@ -1075,14 +1094,14 @@ def state_script(dates: list[str], current: str | None,
 def build_day_html(date_str: str, digest: dict, dates: list[str],
                    prev_date: str | None, next_date: str | None,
                    en_digest=None, has_audio=False) -> str:
-    weekday = f"{weekday_of(date_str)} · {date_str}"
-                   # removed
-    title = "电梯行业日报"
+    label = _format_label(date_str)
+    is_weekly = _is_weekly(date_str)
+    title = "电梯行业周报" if is_weekly else "电梯行业日报"
     audio_html = build_audio_player(date_str, "../") if has_audio else ""
     body = f"""
     <div class="container">
       <div class="day-hero">
-        <div class="date-str">{weekday}</div>
+        <div class="date-str">{label}</div>
         <h1>{title}</h1>
       </div>
       {audio_html}
@@ -1095,7 +1114,7 @@ def build_day_html(date_str: str, digest: dict, dates: list[str],
 
     return PAGE_TEMPLATE.format(
         title=f"电梯行业日报 · {date_str}",
-        description=f"电梯行业{date_str}每日简报，涵盖安全事故、政策标准、老旧改造与企业动态。",
+        description=f"电梯行业{date_str}简报，涵盖安全事故、政策标准、老旧改造与企业动态。",
         css=CSS,
         header=HEADER_HTML.format(base="../", repo=REPO_URL),
         body=body,
@@ -1233,17 +1252,16 @@ def build_index_html(dates: list[str], latest_digest: dict,
         badge = (f'<div class="latest-badge">{bi("最新", "Latest")}</div>'
                  if i == 0 else "")
         mic = '<span class="audio-badge" title="有语音播报">🎧</span>' if d in audio_dates else ""
-        weekday_cell = weekday_of(d)
+        label = _format_label(d)
         cards += f"""
         <a class="date-card" href="daily/{d}.html">
-          <div class="date-label">{d}{mic}</div>
-          <div class="weekday">{weekday_cell}</div>
+          <div class="date-label">{label}{mic}</div>
           {badge}
         </a>"""
 
     latest_section = ""
     if latest_digest:
-        latest_label = f"📅 最新一期 · {latest} {weekday_of(latest)}"
+        latest_label = f"📅 最新一期 · {_format_label(latest)}"
         latest_audio = build_audio_player(latest, "") if latest in audio_dates else ""
         latest_section = f"""
       <div class="section-title">{latest_label}</div>

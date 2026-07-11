@@ -1,12 +1,12 @@
 {
   "date": "2026-07-11",
-  "generated_at": "2026-07-11T21:39:33.562887+08:00",
+  "generated_at": "2026-07-11T22:25:42.061865+08:00",
   "counts": {
-    "news": 4,
-    "accident": 6,
-    "regulation": 0,
-    "renovation": 6,
-    "business": 0
+    "news": 5,
+    "accident": 15,
+    "regulation": 2,
+    "renovation": 13,
+    "business": 1
   },
   "items": {
     "news": [
@@ -38,12 +38,12 @@
       },
       {
         "category": "news",
-        "title": "新电梯网早新闻 2026年7月10日 五月廿六 星期五",
-        "url": "https://www.xindianti.cn/news/show-50753.html",
-        "normalized_url": "https://www.xindianti.cn/news/show-50753.html",
-        "summary": "新电梯 新视野 欢迎收看新电梯网早新闻 今天是2026年7月10日 五月廿六 星期五安徽合肥地铁7号线俄罗斯方块主题扶梯走红 成新晋打卡点近日，安徽省合肥市轨道交通7号线紫庐站一组俄罗斯方块主题自动扶梯在社交平台走",
+        "title": "安徽合肥地铁7号线“俄罗斯方块”主题扶梯走红 成新晋打卡点",
+        "url": "https://www.xindianti.cn/news/show-50752.html",
+        "normalized_url": "https://www.xindianti.cn/news/show-50752.html",
+        "summary": "安徽省合肥市轨道交通7号线紫庐站一组“俄罗斯方块”主题自动扶梯在社交平台走红，凭借充满怀旧感的创意设计，成为合肥地铁新晋网红打卡点，不少网友直呼“踏上扶梯脑子里自动响起游戏BGM”。",
         "source": "新电梯网",
-        "published": "2026-07-10T08:59:58+00:00",
+        "published": "2026-07-09T14:35:15+00:00",
         "importance_hint": 4,
         "metadata": {
           "feed_url": "https://www.xindianti.cn/feed/rss.php?mid=21"
@@ -51,12 +51,25 @@
       },
       {
         "category": "news",
-        "title": "安徽合肥地铁7号线“俄罗斯方块”主题扶梯走红 成新晋打卡点",
-        "url": "https://www.xindianti.cn/news/show-50752.html",
-        "normalized_url": "https://www.xindianti.cn/news/show-50752.html",
-        "summary": "安徽省合肥市轨道交通7号线紫庐站一组“俄罗斯方块”主题自动扶梯在社交平台走红，凭借充满怀旧感的创意设计，成为合肥地铁新晋网红打卡点，不少网友直呼“踏上扶梯脑子里自动响起游戏BGM”。",
+        "title": "热烈祝贺！康力电梯今日登陆CCTV新闻频道",
+        "url": "https://www.xindianti.cn/news/show-50727.html",
+        "normalized_url": "https://www.xindianti.cn/news/show-50727.html",
+        "summary": "康力电梯强势登陆央视新闻频道《每周质量报告》",
         "source": "新电梯网",
-        "published": "2026-07-09T14:35:15+00:00",
+        "published": "2026-07-06T16:33:46+00:00",
+        "importance_hint": 4,
+        "metadata": {
+          "feed_url": "https://www.xindianti.cn/feed/rss.php?mid=21"
+        }
+      },
+      {
+        "category": "news",
+        "title": "电梯行业需要的不是一场\"反内卷\"大会，而是一场真正的市场重构——从安徽省专项治理谈安庆电梯维保市场的现实与未来",
+        "url": "https://www.xindianti.cn/news/show-50720.html",
+        "normalized_url": "https://www.xindianti.cn/news/show-50720.html",
+        "summary": "最近，网上一篇《每一个电梯维保人都应该反对电梯行业开会\"反内卷\"》的文章，引起了不少业内人士讨论。",
+        "source": "新电梯网",
+        "published": "2026-07-06T08:46:49+00:00",
         "importance_hint": 4,
         "metadata": {
           "feed_url": "https://www.xindianti.cn/feed/rss.php?mid=21"
@@ -141,9 +154,153 @@
         "metadata": {
           "feed_url": "https://www.xindianti.cn/feed/rss.php?mid=21"
         }
+      },
+      {
+        "category": "accident",
+        "title": "北京东城消防成功处置电梯困人险情 8名被困群众平安脱险",
+        "url": "https://www.xindianti.cn/news/show-50740.html",
+        "normalized_url": "https://www.xindianti.cn/news/show-50740.html",
+        "summary": "近日，北京东城消防四大队天坛小型站接辖区电梯困人警情，迅速赶赴现场。",
+        "source": "新电梯网",
+        "published": "2026-07-08T09:57:34+00:00",
+        "importance_hint": 3,
+        "metadata": {
+          "feed_url": "https://www.xindianti.cn/feed/rss.php?mid=21"
+        }
+      },
+      {
+        "category": "accident",
+        "title": "操作失误致37部电梯集体停运 四川天府新区市监局约谈涉事企业压实安全责任",
+        "url": "https://www.xindianti.cn/news/show-50739.html",
+        "normalized_url": "https://www.xindianti.cn/news/show-50739.html",
+        "summary": "2026年6月1日，四川天府新区天府明庭小区37部奥的斯电梯突发集体停梯，经多方联合处置，当日16时全部恢复运行。",
+        "source": "新电梯网",
+        "published": "2026-07-08T09:29:37+00:00",
+        "importance_hint": 4,
+        "metadata": {
+          "feed_url": "https://www.xindianti.cn/feed/rss.php?mid=21"
+        }
+      },
+      {
+        "category": "accident",
+        "title": "江西：4岁男童乘扶梯脚被卡 热心路人及时停梯化险为夷",
+        "url": "https://www.xindianti.cn/news/show-50736.html",
+        "normalized_url": "https://www.xindianti.cn/news/show-50736.html",
+        "summary": "一名4岁男童随家人乘坐自动扶梯时，脚部不慎被卷入梯级缝隙中，孩子瞬间因疼痛哭闹不止。",
+        "source": "新电梯网",
+        "published": "2026-07-07T14:50:13+00:00",
+        "importance_hint": 3,
+        "metadata": {
+          "feed_url": "https://www.xindianti.cn/feed/rss.php?mid=21"
+        }
+      },
+      {
+        "category": "accident",
+        "title": "山东青岛一老楼加装电梯停摆半月 多部门介入协调 预计下周恢复运行",
+        "url": "https://www.xindianti.cn/news/show-50734.html",
+        "normalized_url": "https://www.xindianti.cn/news/show-50734.html",
+        "summary": "山东青岛市北区燎原路22号楼二单元的加装电梯在端午节前一天突然停摆，至今已停运半个多月。",
+        "source": "新电梯网",
+        "published": "2026-07-07T10:46:51+00:00",
+        "importance_hint": 4,
+        "metadata": {
+          "feed_url": "https://www.xindianti.cn/feed/rss.php?mid=21"
+        }
+      },
+      {
+        "category": "accident",
+        "title": "湖北武汉青山区通报“7·23”一般机械伤害事故调查报告",
+        "url": "https://www.xindianti.cn/news/show-50733.html",
+        "normalized_url": "https://www.xindianti.cn/news/show-50733.html",
+        "summary": "近日，武汉市青山区应急管理局正式发布青山新沟桥“7·23”一般机械伤害安全事故调查报告。",
+        "source": "新电梯网",
+        "published": "2026-07-07T10:19:16+00:00",
+        "importance_hint": 5,
+        "metadata": {
+          "feed_url": "https://www.xindianti.cn/feed/rss.php?mid=21"
+        }
+      },
+      {
+        "category": "accident",
+        "title": "哈尔滨一老旧电梯急速下降困人16分钟 物业已申请更新改造",
+        "url": "https://www.xindianti.cn/news/show-50729.html",
+        "normalized_url": "https://www.xindianti.cn/news/show-50729.html",
+        "summary": "哈尔滨市道里区天合俊景小区一名老年业主独自乘梯时，电梯上行至12层突发急速下降，卡在9楼与10楼之间，老人被困16分钟后才被救出，受严重惊吓后至今不敢搭乘电梯。",
+        "source": "新电梯网",
+        "published": "2026-07-07T08:28:40+00:00",
+        "importance_hint": 4,
+        "metadata": {
+          "feed_url": "https://www.xindianti.cn/feed/rss.php?mid=21"
+        }
+      },
+      {
+        "category": "accident",
+        "title": "电梯从13楼急速下降1楼！江苏高邮这个小区的安全隐患整改了",
+        "url": "https://www.xindianti.cn/news/show-50726.html",
+        "normalized_url": "https://www.xindianti.cn/news/show-50726.html",
+        "summary": "江苏省高邮市6月19日降雨后电梯突发故障从13楼急速下降至1楼，居民多次反映多年未得到彻底解决。",
+        "source": "新电梯网",
+        "published": "2026-07-06T14:37:29+00:00",
+        "importance_hint": 3,
+        "metadata": {
+          "feed_url": "https://www.xindianti.cn/feed/rss.php?mid=21"
+        }
+      },
+      {
+        "category": "accident",
+        "title": "黑龙江发布2025年特种设备安全状况 全年未发生较大及以上事故",
+        "url": "https://www.xindianti.cn/news/show-50725.html",
+        "normalized_url": "https://www.xindianti.cn/news/show-50725.html",
+        "summary": "近日，黑龙江省市场监督管理局正式发布《2025年全省特种设备安全状况通告》。",
+        "source": "新电梯网",
+        "published": "2026-07-06T14:15:09+00:00",
+        "importance_hint": 5,
+        "metadata": {
+          "feed_url": "https://www.xindianti.cn/feed/rss.php?mid=21"
+        }
+      },
+      {
+        "category": "accident",
+        "title": "老旧电梯更新先过安全关 深圳永丰社区开展专家“挑刺式”安全宣讲",
+        "url": "https://www.xindianti.cn/news/show-50721.html",
+        "normalized_url": "https://www.xindianti.cn/news/show-50721.html",
+        "summary": "深圳宝安区永丰社区香缇湾花园针对小区18台服役超15年、故障频发的老旧电梯更新项目，创新推出“挑刺式”前置安全宣讲，邀请特种设备安全专家直面施工全流程风险点，为居民和施工方提前筑牢安全防线，这也是2026年广东省既有住宅电梯更新“安全先行”试点的典型实践。",
+        "source": "新电梯网",
+        "published": "2026-07-06T09:20:14+00:00",
+        "importance_hint": 4,
+        "metadata": {
+          "feed_url": "https://www.xindianti.cn/feed/rss.php?mid=21"
+        }
       }
     ],
-    "regulation": [],
+    "regulation": [
+      {
+        "category": "regulation",
+        "title": "市场监管总局办公厅关于实施《特种设备使用管理规则》若干问题的通知",
+        "url": "https://www.xindianti.cn/news/show-50738.html",
+        "normalized_url": "https://www.xindianti.cn/news/show-50738.html",
+        "summary": "《特种设备使用管理规则》（TSG 08—2026）已于2026年5月1日起施行。为保障《特种设备使用管理规则》规范有效实施，现就有关问题通知",
+        "source": "新电梯网",
+        "published": "2026-07-08T09:12:03+00:00",
+        "importance_hint": 5,
+        "metadata": {
+          "feed_url": "https://www.xindianti.cn/feed/rss.php?mid=21"
+        }
+      },
+      {
+        "category": "regulation",
+        "title": "未取得资质擅自将3站电梯改造成4站 安徽广德一电梯工程公司被罚2万余元",
+        "url": "https://www.xindianti.cn/news/show-50723.html",
+        "normalized_url": "https://www.xindianti.cn/news/show-50723.html",
+        "summary": "近日，广德市市场监管局通报一起特种设备违法案件：当地某电梯工程公司未取得电梯改造许可，擅自将市场内一台3层3站电梯改造成4层4站，且施工前未告知监管部门、改造后未申请检验。",
+        "source": "新电梯网",
+        "published": "2026-07-06T10:04:27+00:00",
+        "importance_hint": 5,
+        "metadata": {
+          "feed_url": "https://www.xindianti.cn/feed/rss.php?mid=21"
+        }
+      }
+    ],
     "renovation": [
       {
         "category": "renovation",
@@ -199,19 +356,6 @@
       },
       {
         "category": "renovation",
-        "title": "新电梯网早新闻 2026年7月9日 五月廿五 星期四",
-        "url": "https://www.xindianti.cn/news/show-50745.html",
-        "normalized_url": "https://www.xindianti.cn/news/show-50745.html",
-        "summary": "就要给你惊喜｜远大博林特俄罗斯车里雅宾斯克专场推介会圆满落幕，以安全智造守护民生出行",
-        "source": "新电梯网",
-        "published": "2026-07-09T00:00:55+00:00",
-        "importance_hint": 4,
-        "metadata": {
-          "feed_url": "https://www.xindianti.cn/feed/rss.php?mid=21"
-        }
-      },
-      {
-        "category": "renovation",
         "title": "杭州老旧小区试水“按需付费”新模式 能否按下民生出行“快进键”",
         "url": "https://www.xindianti.cn/news/show-50744.html",
         "normalized_url": "https://www.xindianti.cn/news/show-50744.html",
@@ -222,8 +366,126 @@
         "metadata": {
           "feed_url": "https://www.xindianti.cn/feed/rss.php?mid=21"
         }
+      },
+      {
+        "category": "renovation",
+        "title": "就要给你惊喜｜远大博林特俄罗斯车里雅宾斯克专场推介会圆满落幕，以安全智造守护民生出行",
+        "url": "https://www.xindianti.cn/news/show-50743.html",
+        "normalized_url": "https://www.xindianti.cn/news/show-50743.html",
+        "summary": "扬帆欧亚，智造出海。7月6日，远大智能博林特电梯远赴俄罗斯车里雅宾斯克市，携手当地政府、本土开发商、代理商举办专属品牌推介会，以提升电梯安全，服务民生保障为核心主题，带来一场聚焦安全管控、全周期维保的深度行业交流，用中国智造为乌拉尔区域城市民生安全赋能。",
+        "source": "新电梯网",
+        "published": "2026-07-08T11:14:46+00:00",
+        "importance_hint": 4,
+        "metadata": {
+          "feed_url": "https://www.xindianti.cn/feed/rss.php?mid=21"
+        }
+      },
+      {
+        "category": "renovation",
+        "title": "河北省搭建集中采购平台 提速老旧电梯更新惠民工程",
+        "url": "https://www.xindianti.cn/news/show-50742.html",
+        "normalized_url": "https://www.xindianti.cn/news/show-50742.html",
+        "summary": "为扎实推进老旧电梯更新这项民生实事，河北省住建厅细化落地举措，通过线下小区公示、线上业主群推送等多渠道宣传“两新”惠民政策，打消居民顾虑、调动参与积极性。",
+        "source": "新电梯网",
+        "published": "2026-07-08T10:45:30+00:00",
+        "importance_hint": 4,
+        "metadata": {
+          "feed_url": "https://www.xindianti.cn/feed/rss.php?mid=21"
+        }
+      },
+      {
+        "category": "renovation",
+        "title": "告别爬楼难！山西长治潞州区累计1077部电梯入户老旧小区",
+        "url": "https://www.xindianti.cn/news/show-50741.html",
+        "normalized_url": "https://www.xindianti.cn/news/show-50741.html",
+        "summary": "针对辖区老旧小区高层居民尤其是老年群体出行不便的诉求，山西省长治市潞州区持续推进既有住宅加装电梯这项民生工程。",
+        "source": "新电梯网",
+        "published": "2026-07-08T10:14:37+00:00",
+        "importance_hint": 4,
+        "metadata": {
+          "feed_url": "https://www.xindianti.cn/feed/rss.php?mid=21"
+        }
+      },
+      {
+        "category": "renovation",
+        "title": "惠民实事暖民心｜远大博林特助力老旧小区电梯焕新升级",
+        "url": "https://www.xindianti.cn/news/show-50732.html",
+        "normalized_url": "https://www.xindianti.cn/news/show-50732.html",
+        "summary": "从2024年起，沈阳市抢抓国家惠民政策契机，推动住宅老旧电梯更新改造，让居民“不用自己掏腰包”就能换上全新电梯。",
+        "source": "新电梯网",
+        "published": "2026-07-07T09:54:27+00:00",
+        "importance_hint": 4,
+        "metadata": {
+          "feed_url": "https://www.xindianti.cn/feed/rss.php?mid=21"
+        }
+      },
+      {
+        "category": "renovation",
+        "title": "今年2000亿元超长期特别国债支持“两新”设备更新资金已全部下达",
+        "url": "https://www.xindianti.cn/news/show-50731.html",
+        "normalized_url": "https://www.xindianti.cn/news/show-50731.html",
+        "summary": "按照党中央和国务院决策部署，优化实施“两新”政策，2026年安排2000亿元超长期特别国债资金支持设备更新。",
+        "source": "新电梯网",
+        "published": "2026-07-07T09:02:23+00:00",
+        "importance_hint": 4,
+        "metadata": {
+          "feed_url": "https://www.xindianti.cn/feed/rss.php?mid=21"
+        }
+      },
+      {
+        "category": "renovation",
+        "title": "江苏泰州姜堰区37台老旧电梯完成改造 两千余户居民用上“安全梯”",
+        "url": "https://www.xindianti.cn/news/show-50730.html",
+        "normalized_url": "https://www.xindianti.cn/news/show-50730.html",
+        "summary": "江苏省泰州市姜堰区推进的超长期特别国债支持老旧电梯更新项目首批37台电梯全部完工，新市民广场等小区2161户居民告别“高龄”老电梯，出行安全得到切实保障。",
+        "source": "新电梯网",
+        "published": "2026-07-07T08:46:19+00:00",
+        "importance_hint": 4,
+        "metadata": {
+          "feed_url": "https://www.xindianti.cn/feed/rss.php?mid=21"
+        }
+      },
+      {
+        "category": "renovation",
+        "title": "上海一居民自费装爬楼机供全楼使用 因合规争议面临拆除",
+        "url": "https://www.xindianti.cn/news/show-50724.html",
+        "normalized_url": "https://www.xindianti.cn/news/show-50724.html",
+        "summary": "上海一小区居民巢女士为方便腿疾老母亲上下6楼，自费购置一台座椅式爬楼机，承诺免费供全楼12户居民使用。",
+        "source": "新电梯网",
+        "published": "2026-07-06T10:21:13+00:00",
+        "importance_hint": 3,
+        "metadata": {
+          "feed_url": "https://www.xindianti.cn/feed/rss.php?mid=21"
+        }
+      },
+      {
+        "category": "renovation",
+        "title": "山东滕州16部获国债支持老旧电梯更新改造有序推进 惠及千余户居民",
+        "url": "https://www.xindianti.cn/news/show-50722.html",
+        "normalized_url": "https://www.xindianti.cn/news/show-50722.html",
+        "summary": "山东滕州16部纳入中央超长期特别国债支持的老旧住宅电梯更新改造项目已全面进入施工阶段，项目完工后将彻底消除老旧电梯安全隐患，惠及全市1000余户居民。",
+        "source": "新电梯网",
+        "published": "2026-07-06T09:34:15+00:00",
+        "importance_hint": 4,
+        "metadata": {
+          "feed_url": "https://www.xindianti.cn/feed/rss.php?mid=21"
+        }
       }
     ],
-    "business": []
+    "business": [
+      {
+        "category": "business",
+        "title": "四大硬核资源赋能产业升级！2026 第十三届科技大会 10 月 17 日启幕，诚邀各企业报名参会",
+        "url": "https://www.xindianti.cn/news/show-50735.html",
+        "normalized_url": "https://www.xindianti.cn/news/show-50735.html",
+        "summary": "2026 第十三届华表大会筹备工作全面提速，本届大会配套2026 科创引领城市高质量创新发展论坛定于 10 月 17 日 北京 举办。",
+        "source": "新电梯网",
+        "published": "2026-07-07T14:26:06+00:00",
+        "importance_hint": 3,
+        "metadata": {
+          "feed_url": "https://www.xindianti.cn/feed/rss.php?mid=21"
+        }
+      }
+    ]
   }
 }

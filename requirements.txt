@@ -3,3 +3,4 @@ requests>=2.31
 markdown>=3.5
 edge-tts>=7.0
 mutagen>=1.47
+python-docx>=1.0
