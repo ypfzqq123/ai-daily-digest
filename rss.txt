@@ -1,0 +1,7 @@
+https://www.xindianti.cn/feed/rss.php?mid=21
+
+
+export API_KEY="sk-15bcab13933f480e80144d1641c922d0"
+
+$env:API_KEY="sk-15bcab13933f480e80144d1641c922d0"
+python scripts/main.py
