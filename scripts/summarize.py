@@ -7,10 +7,7 @@ import os
 import requests
 
 
-DELIMITER = "===JAPANESE==="
-
-
-SYSTEM_PROMPT = f"""你是一位电梯行业的资深编辑，面向电梯企业从业者、维保人员、物业公司、监管部门和行业研究者输出每日简报。
+SYSTEM_PROMPT = """你是一位电梯行业的资深编辑，面向电梯企业从业者、维保人员、物业公司、监管部门和行业研究者输出每日简报。
 
 【筛选标准】优先选择以下类型的内容，其余的直接丢弃：
 - 安全事故与监管通报（电梯事故、伤亡、故障困人、市场监管局约谈/罚款）
@@ -25,10 +22,9 @@ SYSTEM_PROMPT = f"""你是一位电梯行业的资深编辑，面向电梯企业
 - 纯地方性小新闻（仅影响单个小区的加装案例，除非有全国示范意义）
 
 【输出要求】
-你需要输出**两份**简报：先输出中文版，然后**单独一行**写 `{DELIMITER}`，再输出与中文版逐条对应、结构完全一致的日语版。
-**重要：直接输出简报内容，不要加任何开场白、客套话或解释说明。第一行必须是 `## ⚠️` 分类标题或 `## 📋` 等。**
+直接输出简报正文，不要加任何开场白、客套话或解释说明。
 
-中文版格式（严格遵守）：
+格式（严格遵守）：
 1. 总计 8-12 条，按类别分组：
    ## ⚠️ 安全事故与监管
    ## 📋 政策标准
@@ -43,22 +39,7 @@ SYSTEM_PROMPT = f"""你是一位电梯行业的资深编辑，面向电梯企业
 3. 末尾用 `### 今日观察`：3-4 句话，点出今天最值得关注的趋势或信号，有观点，不废话
 4. 严格基于原文，不编造，专有名词保留品牌/型号英文，其余用中文
 5. 如果某分类当天没有合适内容，直接跳过该分类，不要硬凑
-
-日语版要求：
-1. 是中文版的**忠实翻译**，条目数量、顺序、分组、重要性星级、来源链接完全一致
-2. 分类标题使用对应日语：
-   ## ⚠️ 安全事故と規制
-   ## 📋 政策と標準
-   ## 🏗️ 改修改造と増設
-   ## 🏢 企業動向
-   ## 📰 業界総合
-3. 每条字段用日语标签：
-- **[タイトル]**：一言で何が起きたか。
-  - 重要度：★★★★☆ / 5
-  - ポイント：業界関係者への具体的な影響（約20字以内）
-  - 出典：[Source Name](URL)
-4. 结尾用 `### 今日の所見`，对应中文的今日观察
-5. 来源链接 URL 与中文版保持完全相同"""
+"""
 
 
 WEEKLY_SYSTEM_PROMPT = """你是一位电梯行业的资深编辑，面向电梯企业从业者、维保人员、物业公司、监管部门和行业研究者输出每周简报。
@@ -76,9 +57,9 @@ WEEKLY_SYSTEM_PROMPT = """你是一位电梯行业的资深编辑，面向电梯
 - 纯地方性小新闻（仅影响单个小区的加装案例，除非有全国示范意义）
 
 【输出要求】
-你需要输出**两份**周报：先输出中文版，然后**单独一行**写 `{DELIMITER}`，再输出与中文版逐条对应、结构完全一致的日语版。
+直接输出周报正文，不要加任何开场白、客套话或解释说明。
 
-中文版格式（严格遵守）：
+格式（严格遵守）：
 1. 总计 12-18 条，按类别分组：
    ## ⚠️ 安全事故与监管
    ## 📋 政策标准
@@ -95,23 +76,37 @@ WEEKLY_SYSTEM_PROMPT = """你是一位电梯行业的资深编辑，面向电梯
 4. 严格基于原文，不编造，专有名词保留品牌/型号英文，其余用中文
 5. 如果某分类本周没有合适内容，直接跳过该分类，不要硬凑
 6. 同类内容按重要性从高到低排列，相同主题的资讯可以合并为一条
+"""
 
-日语版要求：
-1. 是中文版的**忠实翻译**，条目数量、顺序、分组、重要性星级、来源链接完全一致
-2. 分类标题使用对应日语：
-   ## ⚠️ 安全事故と規制
-   ## 📋 政策と標準
-   ## 🏗️ 改修改造と増設
-   ## 🏢 企業動向
-   ## 📰 業界総合
-3. 每条字段用日语标签：
-- **[タイトル]**：一言で何が起きたか。
-  - 重要度：★★★★☆ / 5
-  - ポイント：業界関係者への具体的な影響（約20字以内）
-  - 出典：[Source Name](URL)
-  - 日付：MM-DD
-4. 结尾用 `### 今週の所見`，对应中文的本周观察
-5. 来源链接 URL 与中文版保持完全相同"""
+
+TRANSLATE_SYSTEM_PROMPT = """你是一个专业的中日翻译专家，擅长将电梯行业的中文简报翻译成自然流畅的日语。
+
+要求：
+1. 忠实翻译，不增不减，保持原有结构、格式、Markdown 标记、链接完全不变
+2. 分类标题翻译为日语（## ⚠️ 安全事故与监管 → ## ⚠️ 安全事故と規制 等）
+3. 字段标签翻译为日语（重要性 → 重要度，核心要点 → ポイント，来源 → 出典 等）
+4. 观察标题翻译（今日观察 → 今日の所見，本周观察 → 今週の所見）
+5. 专有名词（公司名、品牌名、地名）保留原文不变
+6. 直接输出翻译结果，不要加任何开场白或解释
+"""
+
+
+_CAT_TRANSLATION = {
+    "安全事故与监管": "安全事故と規制",
+    "政策标准": "政策と標準",
+    "老旧改造与加装": "改修改造と増設",
+    "企业动态": "企業動向",
+    "行业综合": "業界総合",
+}
+
+_LABEL_TRANSLATION = {
+    "重要性：": "重要度：",
+    "核心要点：": "ポイント：",
+    "来源：": "出典：",
+    "日期：": "日付：",
+    "今日观察": "今日の所見",
+    "本周观察": "今週の所見",
+}
 
 
 def format_raw_content(data):
@@ -152,32 +147,14 @@ def _wrap(text, date_str, model, title):
 """
 
 
-def summarize(data, date_str):
-    """Generate daily digest via OpenAI-compatible API (DeepSeek by default).
-
-    Returns (zh_markdown, ja_markdown). ja_markdown is None if the model
-    didn't produce a parseable Japanese section.
-    """
+def _call_api(system_prompt, user_prompt, max_tokens=8192):
+    """Make a single API call, return text content."""
     api_key = os.environ.get("API_KEY")
     if not api_key:
         raise ValueError("API_KEY environment variable is required")
 
     base_url = os.environ.get("API_BASE_URL", "https://api.deepseek.com")
     model = os.environ.get("API_MODEL", "deepseek-chat")
-
-    raw_content = format_raw_content(data)
-    if not raw_content.strip():
-        return (
-            f"# 电梯行业日报 - {date_str}\n\n> 今日无内容。\n",
-            None,
-        )
-
-    user_prompt = f"""今天是 {date_str}。
-
-以下是今天收集到的电梯行业原始资讯，请整理成每日简报。
-请优先选择重要性高、对行业有实际参考价值的内容：
-
-{raw_content}"""
 
     url = f"{base_url}/chat/completions"
     headers = {
@@ -187,42 +164,65 @@ def summarize(data, date_str):
     payload = {
         "model": model,
         "messages": [
-            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt},
         ],
         "temperature": 0.7,
-        "max_tokens": 16384,
+        "max_tokens": max_tokens,
     }
 
-    print(f"Calling {model}...")
     resp = requests.post(url, headers=headers, json=payload, timeout=180)
     resp.raise_for_status()
+    return resp.json()["choices"][0]["message"]["content"]
 
-    result = resp.json()
-    text = result["choices"][0]["message"]["content"]
 
-    if DELIMITER in text:
-        zh_text, ja_text = text.split(DELIMITER, 1)
-        zh_text, ja_text = zh_text.strip(), ja_text.strip()
-    else:
-        print("[summarize] WARNING: no Japanese section in response; zh only.")
-        zh_text, ja_text = text.strip(), None
+def _translate_to_japanese(zh_text):
+    """Translate Chinese digest to Japanese via a separate API call."""
+    model = os.environ.get("API_MODEL", "deepseek-chat")
+    print(f"  Translating to Japanese ({model})...")
+
+    user_prompt = f"""请将以下中文电梯行业简报逐句翻译成日语：
+
+{zh_text}"""
+
+    ja_text = _call_api(TRANSLATE_SYSTEM_PROMPT, user_prompt, max_tokens=8192)
+    return ja_text.strip()
+
+
+def summarize(data, date_str):
+    """Generate daily digest (zh), then translate to ja."""
+    model = os.environ.get("API_MODEL", "deepseek-chat")
+
+    raw_content = format_raw_content(data)
+    if not raw_content.strip():
+        return (f"# 电梯行业日报 - {date_str}\n\n> 今日无内容。\n", None)
+
+    user_prompt = f"""今天是 {date_str}。
+
+以下是今天收集到的电梯行业原始资讯，请整理成每日简报。
+请优先选择重要性高、对行业有实际参考价值的内容：
+
+{raw_content}"""
+
+    print(f"Calling {model}...")
+    zh_text = _call_api(SYSTEM_PROMPT, user_prompt, max_tokens=8192)
+    zh_text = zh_text.strip()
 
     zh_md = _wrap(zh_text, date_str, model, "电梯行业日报")
-    ja_md = _wrap(ja_text, date_str, model, "エレベーター業界デイリーダイジェスト") if ja_text else None
+
+    # Translate to Japanese
+    try:
+        ja_text = _translate_to_japanese(zh_text)
+        ja_md = _wrap(ja_text, date_str, model, "エレベーター業界デイリーダイジェスト")
+    except Exception as e:
+        print(f"  Japanese translation failed: {e}")
+        ja_md = None
+
     return zh_md, ja_md
 
 
 def summarize_weekly(data, week_label):
-    """Generate weekly digest via OpenAI-compatible API.
-
-    Returns (zh_markdown, ja_markdown).
-    """
-    api_key = os.environ.get("API_KEY")
-    if not api_key:
-        raise ValueError("API_KEY environment variable is required")
-
-    base_url = os.environ.get("API_BASE_URL", "https://api.deepseek.com")
+    """Generate weekly digest (zh), then translate to ja."""
     model = os.environ.get("API_MODEL", "deepseek-chat")
 
     raw_content = format_raw_content(data)
@@ -236,35 +236,18 @@ def summarize_weekly(data, week_label):
 
 {raw_content}"""
 
-    url = f"{base_url}/chat/completions"
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json",
-    }
-    payload = {
-        "model": model,
-        "messages": [
-            {"role": "system", "content": WEEKLY_SYSTEM_PROMPT},
-            {"role": "user", "content": user_prompt},
-        ],
-        "temperature": 0.7,
-        "max_tokens": 16384,
-    }
-
     print(f"Calling {model} for weekly digest...")
-    resp = requests.post(url, headers=headers, json=payload, timeout=180)
-    resp.raise_for_status()
-
-    result = resp.json()
-    text = result["choices"][0]["message"]["content"]
-
-    if DELIMITER in text:
-        zh_text, ja_text = text.split(DELIMITER, 1)
-        zh_text, ja_text = zh_text.strip(), ja_text.strip()
-    else:
-        print("[summarize_weekly] WARNING: no Japanese section in response; zh only.")
-        zh_text, ja_text = text.strip(), None
+    zh_text = _call_api(WEEKLY_SYSTEM_PROMPT, user_prompt, max_tokens=8192)
+    zh_text = zh_text.strip()
 
     zh_md = _wrap(zh_text, week_label, model, "电梯行业周报")
-    ja_md = _wrap(ja_text, week_label, model, "エレベーター業界週報") if ja_text else None
+
+    # Translate to Japanese
+    try:
+        ja_text = _translate_to_japanese(zh_text)
+        ja_md = _wrap(ja_text, week_label, model, "エレベーター業界週報")
+    except Exception as e:
+        print(f"  Japanese translation failed: {e}")
+        ja_md = None
+
     return zh_md, ja_md
