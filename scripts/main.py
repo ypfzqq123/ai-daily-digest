@@ -151,8 +151,8 @@ def _generate_word(markdown: str, filepath: Path) -> None:
             i += 1
             continue
 
-        # 来源 line - has Markdown links, render as clickable
-        if line.startswith('- 来源'):
+        # 来源/出典 line - has Markdown links, render as clickable
+        if line.startswith('- 来源') or line.startswith('- 出典'):
             text = line[2:].strip()
             p = doc.add_paragraph()
             p.paragraph_format.left_indent = Inches(0.5)
@@ -160,8 +160,9 @@ def _generate_word(markdown: str, filepath: Path) -> None:
             i += 1
             continue
 
-        # Other metadata lines (重要性, 核心要点, 日期)
-        if line.startswith('- 重要性') or line.startswith('- 核心要点') or line.startswith('- 日期'):
+        # Other metadata lines (重要性/重要度, 核心要点/ポイント, 日期/日付)
+        if any(line.startswith(p) for p in ['- 重要性', '- 核心要点', '- 日期',
+                                              '- 重要度', '- ポイント', '- 日付']):
             text = line[2:].strip()
             p = doc.add_paragraph()
             p.paragraph_format.left_indent = Inches(0.5)
