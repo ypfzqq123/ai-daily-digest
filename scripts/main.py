@@ -229,27 +229,38 @@ def main():
 
     # Step 3: AI summarization
     if weekly:
-        print("\n[Step 3] Generating AI weekly summary...")
+        print("\n[Step 3] Generating AI weekly summary (zh + ja)...")
         label_for_file = f"{week_start.strftime('%Y%m%d')}-{week_end.strftime('%Y%m%d')}"
-        markdown = summarize_weekly(data, week_label)
+        markdown, markdown_ja = summarize_weekly(data, week_label)
     else:
-        print("\n[Step 3] Generating AI summary...")
+        print("\n[Step 3] Generating AI summary (zh + ja)...")
         label_for_file = date_str
-        markdown, _ = summarize(data, date_str)
+        markdown, markdown_ja = summarize(data, date_str)
 
-    # Step 4: Save Markdown
+    # Step 4: Save Markdown (zh + ja)
     output_dir = Path(__file__).parent.parent / "daily"
     output_dir.mkdir(exist_ok=True)
     output_file = output_dir / f"{label_for_file}.md"
     output_file.write_text(markdown, encoding="utf-8")
     print(f"\n[Step 4] Saved to {output_file}")
 
-    # Step 5: Generate Word document
-    print("\n[Step 5] Generating Word document...")
+    if markdown_ja:
+        output_file_ja = output_dir / f"{label_for_file}.ja.md"
+        output_file_ja.write_text(markdown_ja, encoding="utf-8")
+        print(f"          Saved Japanese to {output_file_ja}")
+    else:
+        print("          No Japanese version generated.")
+    print(f"\n[Step 4] Saved to {output_file}")
+
+    # Step 5: Generate Word documents (zh + ja)
+    print("\n[Step 5] Generating Word documents...")
     word_dir = Path(__file__).parent.parent / "weekly"
     word_dir.mkdir(exist_ok=True)
     word_file = word_dir / f"{label_for_file}.docx"
     _generate_word(markdown, word_file)
+    if markdown_ja:
+        word_file_ja = word_dir / f"{label_for_file}_ja.docx"
+        _generate_word(markdown_ja, word_file_ja)
 
     # Step 6: Voice broadcast
     print("\n[Step 6] Generating voice broadcast...")

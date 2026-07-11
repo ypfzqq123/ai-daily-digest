@@ -184,7 +184,7 @@ a:hover { text-decoration: underline; }
 .site-header nav a:hover { background: var(--border); color: var(--text); text-decoration: none; }
 
 /* ── Theme / language toggle ── */
-.theme-toggle {
+.theme-toggle, .lang-toggle {
   background: var(--card);
   border: 1px solid var(--border-strong);
   border-radius: 8px;
@@ -195,8 +195,12 @@ a:hover { text-decoration: underline; }
   cursor: pointer;
   transition: border-color .15s, background .15s;
 }
-.theme-toggle { width: 34px; }
-.theme-toggle:hover { border-color: #58a6ff; }
+.theme-toggle, .lang-toggle { width: 34px; }
+.theme-toggle:hover, .lang-toggle:hover { border-color: #58a6ff; }
+n	/* ── Language content toggle ── */
+	html[data-lang="ja"] [data-lang-content="zh"] { display: none; }
+	html[data-lang="zh"] [data-lang-content="ja"] { display: none; }
+t.lang-toggle { padding: 0 12px; font-size: 13px; font-weight: 600; min-width: 42px; }
 
 
 /* ── Hot words / trends ── */
@@ -557,17 +561,17 @@ JS = """
       var q = si.value.trim().toLowerCase();
       if (q.length < 2) { sr.classList.remove('active'); sr.innerHTML = ''; return; }
       loadIndex().then(function (idx) {
-        var en = false;  // no English version
-        function fTitle(h) { return (en && h.title_en) ? h.title_en : h.title; }
-        function fDesc(h) { return (en && h.desc_en) ? h.desc_en : h.desc; }
-        function fCat(h) { return (en && h.cat_en) ? h.cat_en : h.cat; }
+        var en = window.CUR_LANG === 'ja';  // ja version
+        function fTitle(h) { return (en && h.title_ja) ? h.title_ja : h.title; }
+        function fDesc(h) { return (en && h.desc_ja) ? h.desc_ja : h.desc; }
+        function fCat(h) { return (en && h.cat_ja) ? h.cat_ja : h.cat; }
         var hits = idx.filter(function (it) {
           return (fTitle(it) + ' ' + fDesc(it) + ' ' + it.title + ' ' + it.desc)
             .toLowerCase().indexOf(q) !== -1;
         }).slice(0, 25);
         if (!hits.length) {
           sr.innerHTML = '<div class="sr-empty">' +
-            (en ? 'No matches' : '没有匹配结果') + '</div>';
+            (en ? window.CUR_LANG === 'ja' ? '該当なし' : 'No matches' : window.CUR_LANG === 'ja' ? '該当なし' : '没有匹配结果') + '</div>';
         } else {
           sr.innerHTML = hits.map(function (h) {
             return '<a class="sr-item" href="' + BASE + 'daily/' + h.date + '.html">' +
@@ -675,6 +679,28 @@ JS = """
     });
   }
 
+  // ── Language toggle (zh/ja) ──
+  function curLang() {
+    return document.documentElement.getAttribute('data-lang') === 'ja' ? 'ja' : 'zh';
+  }
+  window.CUR_LANG = curLang();
+  var lt = document.getElementById('langToggle');
+  function applyLang(lang) {
+    document.documentElement.setAttribute('data-lang', lang);
+    document.documentElement.setAttribute('lang', lang === 'ja' ? 'ja' : 'zh-Hans');
+    window.CUR_LANG = lang;
+    if (lt) lt.textContent = lang === 'ja' ? '中' : '日';
+    if (si) si.setAttribute('placeholder', PH[lang]);
+  }
+  applyLang(curLang());
+  if (lt) {
+    lt.addEventListener('click', function () {
+      var next = curLang() === 'ja' ? 'zh' : 'ja';
+      try { localStorage.setItem('lang', next); } catch (e) {}
+      applyLang(next);
+    });
+  }
+
   // ── Hot-word tags → search ──
   document.querySelectorAll('.trend-tag').forEach(function (tag) {
     tag.addEventListener('click', function () {
@@ -737,7 +763,7 @@ JS = """
       var url = el.getAttribute('data-copy-feed');
       var done = function () {
         var old = el.textContent;
-        el.textContent = "✓ 已复制订阅链接";
+        el.textContent = "✓ 已{bi("复制", "コピー")}订阅链接";
         setTimeout(function () { el.textContent = old; }, 1800);
       };
       if (navigator.clipboard) { navigator.clipboard.writeText(url).then(done, done); }
@@ -760,7 +786,7 @@ HEADER_HTML = """
     <input id="datePicker" type="date" class="date-picker" aria-label="选择日期">
     <button id="themeToggle" class="theme-toggle" aria-label="切换主题" title="切换浅色/深色">🌙</button>
     <nav>
-      <a href="{base}index.html">归档</a>
+      <a href="{base}index.html"><span data-lang-content="zh">归档</span><span data-lang-content="ja">アーカイブ</span></a>
       <a href="{repo}" target="_blank">GitHub</a>
     </nav>
   </div>
@@ -770,7 +796,7 @@ HEADER_HTML = """
 FOOTER_HTML = """
 <button id="backToTop" aria-label="回到顶部">↑</button>
 <footer class="site-footer">
-  <span>© 电梯行业日报 · 全自动采集 · DeepSeek 智能筛选 · 每日更新</span>
+  <span data-lang-content="zh">© 电梯行业日报 · 全自动采集 · DeepSeek 智能筛选 · 每日更新</span>
   
 </footer>
 """
@@ -789,7 +815,10 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
 	        if (!t) t = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
 	        if (t === "light") document.documentElement.setAttribute("data-theme", "light");
 	      }} catch (e) {{}}
-	      document.documentElement.setAttribute("data-lang", "zh");
+	      var lng = localStorage.getItem("lang");
+        if (!lng) lng = (navigator.language || "zh").toLowerCase().indexOf("ja") === 0 ? "ja" : "zh";
+        document.documentElement.setAttribute("data-lang", lng);
+        if (lng === "ja") document.documentElement.setAttribute("lang", "ja");
 	    }})();
 	  </script>
   <style>{css}</style>
@@ -822,12 +851,13 @@ def cat_type(name: str, emoji: str) -> str:
 
 
 CAT_LABELS = [("all", "全部"), ("accident", "安全监管"), ("regulation", "政策标准"), ("renovation", "老旧改造"), ("business", "企业动态"), ("news", "行业综合")]
-CAT_LABELS_EN = [("all", "All"), ("accident", "Safety"), ("regulation", "Policy"), ("renovation", "Modernization"), ("business", "Business"), ("news", "General")]
+CAT_LABELS_JA = [("all", "すべて"), ("accident", "安全事故"), ("regulation", "政策標準"), ("renovation", "改修改造"), ("business", "企業動向"), ("news", "業界総合")]
 
 
-def bi(zh: str, en: str) -> str:
-    """Chinese-only digest; return zh text directly."""
-    return zh
+def bi(zh: str, ja: str) -> str:
+    """Inline dual-language span pair, toggled by html[data-lang] + CSS."""
+    return (f'<span data-lang-content="zh">{zh}</span>'
+            f'<span data-lang-content="ja">{ja}</span>')
 
 
 # ── Markdown parser ─────────────────────────────────────────────────────────────
@@ -993,8 +1023,12 @@ def build_digest_body(digest: dict, lang: str = "zh") -> str:
     obs_html = ""
     if digest["observation"]:
         speak_text = attr_escape(digest["observation"])
-        obs_heading, btn_play, btn_stop, speak_lang = (
-            "💡 今日观察", "🔊 朗读今日观察", "⏹ 停止", "zh-CN")
+        if lang == "ja":
+            obs_heading, btn_play, btn_stop, speak_lang = (
+                "💡 今日の所見", "🔊 読み上げ", "⏹ 停止", "ja-JP")
+        else:
+            obs_heading, btn_play, btn_stop, speak_lang = (
+                "💡 今日观察", "🔊 朗读今日观察", "⏹ 停止", "zh-CN")
         obs_html = f"""
         <div class="observation">
           <h2>{obs_heading}</h2>
@@ -1016,8 +1050,8 @@ def build_audio_player(date_str: str, base: str) -> str:
     return f"""
     <div class="audio-player">
       <div class="ap-text">
-        <span class="ap-label">🎧 语音播报</span>
-        <span class="ap-sub">通勤路上用耳朵听行业简报</span>
+        <span class="ap-label">🎧 {bi("语音播报", "音声配信")}</span>
+        <span class="ap-sub">{bi("通勤路上用耳朵听行业简报", "通勤中に音声で業界ニュースを")}</span>
       </div>
       <audio controls preload="none" src="{base}audio/{date_str}.mp3" data-date="{date_str}"></audio>
     </div>"""
@@ -1030,21 +1064,21 @@ def build_podcast_cta(base: str) -> str:
     <div style="text-align:center; margin-top:20px;">
       <div class="podcast-cta-row">
         <a class="podcast-cta primary" href="{XIAOYUZHOU_URL}" target="_blank" rel="noopener">
-          🎧 🎧 在小宇宙收听
+          🎧 {bi("🎧 在小宇宙收听", "🎧 ポッドキャストで聴く")}
         </a>
         <a class="podcast-cta" href="{base}podcast.xml" target="_blank" rel="noopener">
-          更多播放器 / RSS
+          {bi("更多播放器 / RSS", "他のアプリ / RSS")}
         </a>
       </div>
       <div class="podcast-hint">
-        用 Apple 播客 / Pocket Casts 的朋友可添加订阅源：
+        {bi("用 Apple 播客 / Pocket Casts 的朋友可添加订阅源：", "Apple Podcasts / Pocket Castsをご利用の方は下記フィードを追加：")}
         <code>{feed_url}</code>
-        <a href="#" data-copy-feed="{feed_url}" style="margin-left:8px;">复制</a>
+        <a href="#" data-copy-feed="{feed_url}" style="margin-left:8px;">{bi("复制", "コピー")}</a>
       </div>
     </div>"""
 
 
-def render_digest_dual(zh_digest: dict, en_digest: dict | None = None) -> str:
+def render_digest_dual(zh_digest: dict, ja_digest: dict | None = None) -> str:
     """Render the digest body (Chinese only)."""
     return build_digest_body(zh_digest, "zh")
 
@@ -1093,7 +1127,7 @@ def state_script(dates: list[str], current: str | None,
 
 def build_day_html(date_str: str, digest: dict, dates: list[str],
                    prev_date: str | None, next_date: str | None,
-                   en_digest=None, has_audio=False) -> str:
+                   ja_digest=None, has_audio=False) -> str:
     label = _format_label(date_str)
     is_weekly = _is_weekly(date_str)
     title = "电梯行业周报" if is_weekly else "电梯行业日报"
@@ -1242,7 +1276,7 @@ def build_trends_html(trends: list, window: int) -> str:
 def build_index_html(dates: list[str], latest_digest: dict,
                      trends_html: str = "",
                      
-                     audio_dates: set | None = None) -> str:
+                     audio_dates: set | None = None, ja_digest: dict | None = None) -> str:
     latest = dates[-1] if dates else ""
     audio_dates = audio_dates or set()
 
@@ -1261,12 +1295,13 @@ def build_index_html(dates: list[str], latest_digest: dict,
 
     latest_section = ""
     if latest_digest:
-        latest_label = f"📅 最新一期 · {_format_label(latest)}"
+        latest_label = bi(f"📅 最新一期 · {_format_label(latest)}",
+                       f"📅 最新 · {_format_label(latest)}")
         latest_audio = build_audio_player(latest, "") if latest in audio_dates else ""
         latest_section = f"""
       <div class="section-title">{latest_label}</div>
       {latest_audio}
-      {render_digest_dual(latest_digest)}"""
+      {render_digest_dual(latest_digest, ja_digest)}"""
 
     podcast_cta = build_podcast_cta("") if audio_dates else ""
 
@@ -1283,7 +1318,7 @@ def build_index_html(dates: list[str], latest_digest: dict,
         {podcast_cta}
       </div>
       {latest_section}
-      <div class="section-title">{bi("🗂 历史归档", "🗂 Archive")}</div>
+      <div class="section-title">{bi("🗂 历史归档", "🗂 アーカイブ")}</div>
       <div class="date-grid">{cards}</div>
       {trends_html}
     </div>"""
@@ -1300,11 +1335,16 @@ def build_index_html(dates: list[str], latest_digest: dict,
     )
 
 
-def build_search_index(parsed_by_date: dict, parsed_by_date_en: dict | None = None) -> list:
-    """Flat list of every item for client-side search."""
+def build_search_index(parsed_by_date: dict, parsed_by_date_ja: dict | None = None) -> list:
+    """Flat list of every item for client-side search (zh + ja)."""
+    parsed_by_date_ja = parsed_by_date_ja or {}
     index = []
     for date_str, digest in parsed_by_date.items():
+        ja_digest = parsed_by_date_ja.get(date_str)
+        ja_cats = ja_digest["categories"] if ja_digest else []
         for ci, cat in enumerate(digest["categories"]):
+            ja_cat = ja_cats[ci] if ci < len(ja_cats) else None
+            ja_items = ja_cat["items"] if ja_cat else []
             for ii, item in enumerate(cat["items"]):
                 entry = {
                     "date": date_str,
@@ -1313,6 +1353,11 @@ def build_search_index(parsed_by_date: dict, parsed_by_date_en: dict | None = No
                     "cat": cat["name"],
                     "stars": item["star_count"],
                 }
+                if ja_cat:
+                    entry["cat_ja"] = ja_cat["name"]
+                if ii < len(ja_items):
+                    entry["title_ja"] = ja_items[ii]["title"]
+                    entry["desc_ja"] = ja_items[ii]["desc"]
                 index.append(entry)
     # newest first
     index.sort(key=lambda x: x["date"], reverse=True)
@@ -1371,7 +1416,7 @@ def build_podcast_xml(audio_dates_desc: list[str], parsed_by_date: dict,
         else:
             notes = parsed_by_date.get(d, {}).get("observation", "")
         notes = notes.strip()[:1800]
-        title = f"电梯行业日报 · {d} {weekday_of(d)}"
+        title = f"エレベーター業界ダイジェスト · {d} {weekday_of(d)}"
         dur_tag = f"\n      <itunes:duration>{duration}</itunes:duration>" if duration else ""
         items.append(f"""    <item>
       <title>{xml_escape(title)}</title>
@@ -1388,17 +1433,17 @@ def build_podcast_xml(audio_dates_desc: list[str], parsed_by_date: dict,
 <?xml-stylesheet type="text/xsl" href="podcast.xsl"?>
 <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
-    <title>AI 每日简报 · AI Daily Digest</title>
+    <title>エレベーター業界ダイジェスト · Elevator Daily Digest</title>
     <link>{SITE_URL}</link>
     <language>zh-cn</language>
     <description>{xml_escape(PODCAST_DESC)}</description>
-    <itunes:author>AI Daily Digest</itunes:author>
+    <itunes:author>Elevator Daily Digest</itunes:author>
     <itunes:summary>{xml_escape(PODCAST_DESC)}</itunes:summary>
     <itunes:type>episodic</itunes:type>
     <itunes:explicit>no</itunes:explicit>
     <itunes:category text="Technology"/>
     <itunes:image href="{cover}"/>
-    <image><url>{cover}</url><title>AI 每日简报</title><link>{SITE_URL}</link></image>
+    <image><url>{cover}</url><title>エレベーター業界ダイジェスト</title><link>{SITE_URL}</link></image>
     <itunes:owner><itunes:name>AI Daily Digest</itunes:name></itunes:owner>
 {chr(10).join(items)}
   </channel>
@@ -1465,7 +1510,7 @@ CREATOR_HEAD = """<!DOCTYPE html>
   .foot { text-align: center; color: #484f58; font-size: 13px; margin-top: 32px; }
 </style></head><body><div class="wrap">
 <h1>🎙️ 小宇宙上传助手</h1>
-<p class="lead">每天打开此页 → 下载音频、复制标题与 Show Notes → 到小宇宙后台「创建单集」粘贴上传即可。</p>
+<p class="lead">每天打开此页 → 下载音频、{bi("复制", "コピー")}标题与 Show Notes → 到小宇宙后台「创建单集」粘贴上传即可。</p>
 <p class="cover-tip">单集封面统一用：<code>__SITE__podcast-cover.png</code></p>
 """
 
@@ -1476,7 +1521,7 @@ CREATOR_TAIL = """
 (function () {
   function flash(btn, ok) {
     var old = btn.textContent;
-    btn.textContent = ok ? '✓ 已复制' : '复制失败';
+    btn.textContent = ok ? '✓ 已{bi("复制", "コピー")}' : '{bi("复制", "コピー")}失败';
     setTimeout(function () { btn.textContent = old; }, 1600);
   }
   document.querySelectorAll('[data-copy]').forEach(function (btn) {
@@ -1497,19 +1542,19 @@ def build_creator_page(audio_dates_desc: list[str], parsed_by_date: dict) -> str
     rows = ""
     for d in audio_dates_desc:
         digest = parsed_by_date.get(d, {"categories": [], "observation": ""})
-        title = f"电梯行业日报 · {d} {weekday_of(d)}"
+        title = f"エレベーター業界ダイジェスト · {d} {weekday_of(d)}"
         notes = build_shownotes(digest, d)
         mp3 = f"audio/{d}.mp3"
         rows += f"""
 <div class="ep">
   <div class="ep-h">
     <span class="ep-title" id="t-{d}">{attr_escape(title)}</span>
-    <button class="cbtn" data-copy="t-{d}">📋 复制标题</button>
+    <button class="cbtn" data-copy="t-{d}">📋 {bi("复制", "コピー")}标题</button>
   </div>
   <audio controls preload="none" src="{mp3}"></audio>
   <div class="acts">
     <a class="cbtn" href="{mp3}" download="{d}.mp3">⬇️ 下载音频</a>
-    <button class="cbtn" data-copy="n-{d}">📋 复制 Show Notes</button>
+    <button class="cbtn" data-copy="n-{d}">📋 {bi("复制", "コピー")} Show Notes</button>
   </div>
   <details><summary>预览 Show Notes</summary><pre class="notes" id="n-{d}">{attr_escape(notes)}</pre></details>
 </div>"""
@@ -1540,30 +1585,36 @@ def generate_site(root: Path | None = None) -> None:
     audio_dates = {d for d in dates if (docs_audio_dir / f"{d}.mp3").exists()}
 
     parsed_by_date = {}
+    parsed_by_date_ja = {}
     for md_file in md_files:
         date_str = md_file.stem
         parsed_by_date[date_str] = parse_digest(md_file.read_text(encoding="utf-8"))
+        ja_file = daily_dir / f"{date_str}.ja.md"
+        if ja_file.exists():
+            parsed_by_date_ja[date_str] = parse_digest(ja_file.read_text(encoding="utf-8"))
 
     for i, date_str in enumerate(dates):
         digest = parsed_by_date[date_str]
         prev_date = dates[i - 1] if i > 0 else None
         next_date = dates[i + 1] if i < len(dates) - 1 else None
         html = build_day_html(date_str, digest, dates, prev_date, next_date,
+                              ja_digest=parsed_by_date_ja.get(date_str),
                               has_audio=date_str in audio_dates)
         (docs_daily_dir / f"{date_str}.html").write_text(html, encoding="utf-8")
 
     # Index with latest digest inline + trending hot words
     latest_digest = parsed_by_date[dates[-1]] if dates else {}
+    latest_ja_digest = parsed_by_date_ja.get(dates[-1]) if dates else None
     trend_window = 7
     trends = compute_trends(parsed_by_date, dates, window=trend_window)
     trends_html = build_trends_html(trends, trend_window)
     (docs_dir / "index.html").write_text(
-        build_index_html(dates, latest_digest, trends_html, audio_dates=audio_dates),
+        build_index_html(dates, latest_digest, trends_html, audio_dates=audio_dates, ja_digest=latest_ja_digest),
         encoding="utf-8")
 
     # Search index (Chinese only)
     (docs_dir / "search-index.json").write_text(
-        json.dumps(build_search_index(parsed_by_date),
+        json.dumps(build_search_index(parsed_by_date, parsed_by_date_ja),
                    ensure_ascii=False),
         encoding="utf-8")
 
