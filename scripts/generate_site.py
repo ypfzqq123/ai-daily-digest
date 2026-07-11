@@ -20,10 +20,9 @@ from xml.sax.saxutils import escape as _xml_escape
 
 
 WEEKDAYS = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"]
-WEEKDAYS_EN = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 REPO_URL = "https://github.com/Jimmuji/ai-daily-digest"
 SITE_URL = "https://jimmuji.github.io/ai-daily-digest/"
-XIAOYUZHOU_URL = "https://www.xiaoyuzhoufm.com/podcast/6a325e149357568efe4741ef"
+XIAOYUZHOU_URL = ""  # optional
 
 
 # ── CSS ────────────────────────────────────────────────────────────────────────
@@ -185,7 +184,7 @@ a:hover { text-decoration: underline; }
 .site-header nav a:hover { background: var(--border); color: var(--text); text-decoration: none; }
 
 /* ── Theme / language toggle ── */
-.theme-toggle, .lang-toggle {
+.theme-toggle {
   background: var(--card);
   border: 1px solid var(--border-strong);
   border-radius: 8px;
@@ -197,12 +196,8 @@ a:hover { text-decoration: underline; }
   transition: border-color .15s, background .15s;
 }
 .theme-toggle { width: 34px; }
-.lang-toggle { padding: 0 12px; font-size: 13px; font-weight: 600; min-width: 42px; }
-.theme-toggle:hover, .lang-toggle:hover { border-color: #58a6ff; }
+.theme-toggle:hover { border-color: #58a6ff; }
 
-/* ── Language content toggle ── */
-html[data-lang="en"] [data-lang-content="zh"] { display: none; }
-html[data-lang="zh"] [data-lang-content="en"] { display: none; }
 
 /* ── Hot words / trends ── */
 .trends {
@@ -562,7 +557,7 @@ JS = """
       var q = si.value.trim().toLowerCase();
       if (q.length < 2) { sr.classList.remove('active'); sr.innerHTML = ''; return; }
       loadIndex().then(function (idx) {
-        var en = window.CUR_LANG === 'en';
+        var en = false;  // no English version
         function fTitle(h) { return (en && h.title_en) ? h.title_en : h.title; }
         function fDesc(h) { return (en && h.desc_en) ? h.desc_en : h.desc; }
         function fCat(h) { return (en && h.cat_en) ? h.cat_en : h.cat; }
@@ -680,29 +675,6 @@ JS = """
     });
   }
 
-  // ── Language toggle ──
-  var PH = { zh: '搜索全部日报…', en: 'Search all digests…' };
-  function curLang() {
-    return document.documentElement.getAttribute('data-lang') === 'en' ? 'en' : 'zh';
-  }
-  window.CUR_LANG = curLang();
-  var lt = document.getElementById('langToggle');
-  function applyLang(lang) {
-    document.documentElement.setAttribute('data-lang', lang);
-    document.documentElement.setAttribute('lang', lang === 'en' ? 'en' : 'zh-Hans');
-    window.CUR_LANG = lang;
-    if (lt) lt.textContent = lang === 'en' ? '中' : 'EN';
-    if (si) si.setAttribute('placeholder', PH[lang]);
-  }
-  applyLang(curLang());
-  if (lt) {
-    lt.addEventListener('click', function () {
-      var next = curLang() === 'en' ? 'zh' : 'en';
-      try { localStorage.setItem('lang', next); } catch (e) {}
-      applyLang(next);
-    });
-  }
-
   // ── Hot-word tags → search ──
   document.querySelectorAll('.trend-tag').forEach(function (tag) {
     tag.addEventListener('click', function () {
@@ -765,7 +737,7 @@ JS = """
       var url = el.getAttribute('data-copy-feed');
       var done = function () {
         var old = el.textContent;
-        el.textContent = (window.CUR_LANG === 'en' ? '✓ Copied!' : '✓ 已复制订阅链接');
+        el.textContent = "✓ 已复制订阅链接";
         setTimeout(function () { el.textContent = old; }, 1800);
       };
       if (navigator.clipboard) { navigator.clipboard.writeText(url).then(done, done); }
@@ -786,10 +758,9 @@ HEADER_HTML = """
       <div id="searchResults" class="search-results"></div>
     </div>
     <input id="datePicker" type="date" class="date-picker" aria-label="选择日期">
-    <button id="langToggle" class="lang-toggle" aria-label="切换语言 / Switch language">EN</button>
     <button id="themeToggle" class="theme-toggle" aria-label="切换主题" title="切换浅色/深色">🌙</button>
     <nav>
-      <a href="{base}index.html"><span data-lang-content="zh">归档</span><span data-lang-content="en">Archive</span></a>
+      <a href="{base}index.html">归档</a>
       <a href="{repo}" target="_blank">GitHub</a>
     </nav>
   </div>
@@ -799,8 +770,8 @@ HEADER_HTML = """
 FOOTER_HTML = """
 <button id="backToTop" aria-label="回到顶部">↑</button>
 <footer class="site-footer">
-  <span data-lang-content="zh">© AI Daily Digest · 全自动采集 · DeepSeek 智能筛选 · 每日更新</span>
-  <span data-lang-content="en">© AI Daily Digest · Auto-collected · Curated by DeepSeek · Updated daily</span>
+  <span>© 电梯行业日报 · 全自动采集 · DeepSeek 智能筛选 · 每日更新</span>
+  
 </footer>
 """
 
@@ -811,21 +782,16 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{title}</title>
   <meta name="description" content="{description}">
-  <script>
-    (function () {{
-      try {{
-        var t = localStorage.getItem('theme');
-        if (!t) t = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
-        if (t === 'light') document.documentElement.setAttribute('data-theme', 'light');
-      }} catch (e) {{}}
-      try {{
-        var lng = localStorage.getItem('lang');
-        if (!lng) lng = (navigator.language || 'zh').toLowerCase().indexOf('zh') === 0 ? 'zh' : 'en';
-        document.documentElement.setAttribute('data-lang', lng);
-        if (lng === 'en') document.documentElement.setAttribute('lang', 'en');
-      }} catch (e) {{ document.documentElement.setAttribute('data-lang', 'zh'); }}
-    }})();
-  </script>
+	  <script>
+	    (function () {{
+	      try {{
+	        var t = localStorage.getItem("theme");
+	        if (!t) t = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+	        if (t === "light") document.documentElement.setAttribute("data-theme", "light");
+	      }} catch (e) {{}}
+	      document.documentElement.setAttribute("data-lang", "zh");
+	    }})();
+	  </script>
   <style>{css}</style>
 </head>
 <body>
@@ -842,25 +808,26 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
 
 def cat_type(name: str, emoji: str) -> str:
     s = (name or "") + (emoji or "")
-    if any(k in s for k in ["论文", "paper", "研究", "📄", "📑"]):
-        return "paper"
-    if any(k in s for k in ["项目", "开源", "工具", "repo", "🔧", "🛠"]):
-        return "project"
-    if any(k in s for k in ["热议", "讨论", "discourse", "buzz", "社区", "🐦", "🔥"]):
-        return "buzz"
-    if any(k in s for k in ["新闻", "动态", "行业", "资讯", "📰"]):
+    if any(k in s for k in ["事故", "安全", "监管", "通报", "⚠️"]):
+        return "accident"
+    if any(k in s for k in ["政策", "标准", "法规", "规范", "📋"]):
+        return "regulation"
+    if any(k in s for k in ["改造", "加装", "更新", "老旧", "🏗️"]):
+        return "renovation"
+    if any(k in s for k in ["企业", "公司", "动态", "中标", "合作", "🏢"]):
+        return "business"
+    if any(k in s for k in ["新闻", "综合", "行业", "动态", "资讯", "📰"]):
         return "news"
     return "other"
 
 
-CAT_LABELS = [("all", "全部"), ("news", "新闻"), ("paper", "论文"), ("project", "项目"), ("buzz", "热议")]
-CAT_LABELS_EN = [("all", "All"), ("news", "News"), ("paper", "Papers"), ("project", "Projects"), ("buzz", "Buzz")]
+CAT_LABELS = [("all", "全部"), ("accident", "安全监管"), ("regulation", "政策标准"), ("renovation", "老旧改造"), ("business", "企业动态"), ("news", "行业综合")]
+CAT_LABELS_EN = [("all", "All"), ("accident", "Safety"), ("regulation", "Policy"), ("renovation", "Modernization"), ("business", "Business"), ("news", "General")]
 
 
 def bi(zh: str, en: str) -> str:
-    """Inline dual-language span pair, toggled by html[data-lang] + CSS."""
-    return (f'<span data-lang-content="zh">{zh}</span>'
-            f'<span data-lang-content="en">{en}</span>')
+    """Chinese-only digest; return zh text directly."""
+    return zh
 
 
 # ── Markdown parser ─────────────────────────────────────────────────────────────
@@ -987,8 +954,8 @@ def build_item_html(item: dict) -> str:
 
 
 def build_filter_bar(present_types: set, lang: str = "zh") -> str:
-    labels = CAT_LABELS_EN if lang == "en" else CAT_LABELS
-    star_label = "★ Top picks (4+)" if lang == "en" else "★ 只看重点 (4+)"
+    labels = CAT_LABELS
+    star_label = "★ 只看重点 (4+)"
     tabs = ""
     for key, label in labels:
         if key != "all" and key not in present_types:
@@ -1021,17 +988,13 @@ def build_digest_body(digest: dict, lang: str = "zh") -> str:
           {items_html}
         </div>"""
 
-    empty_msg = "No items match this filter." if lang == "en" else "该筛选条件下没有内容。"
+    empty_msg = "该筛选条件下没有内容。"
 
     obs_html = ""
     if digest["observation"]:
         speak_text = attr_escape(digest["observation"])
-        if lang == "en":
-            obs_heading, btn_play, btn_stop, speak_lang = (
-                "💡 Today's Take", "🔊 Read aloud", "⏹ Stop", "en-US")
-        else:
-            obs_heading, btn_play, btn_stop, speak_lang = (
-                "💡 今日观察", "🔊 朗读今日观察", "⏹ 停止", "zh-CN")
+        obs_heading, btn_play, btn_stop, speak_lang = (
+            "💡 今日观察", "🔊 朗读今日观察", "⏹ 停止", "zh-CN")
         obs_html = f"""
         <div class="observation">
           <h2>{obs_heading}</h2>
@@ -1053,8 +1016,8 @@ def build_audio_player(date_str: str, base: str) -> str:
     return f"""
     <div class="audio-player">
       <div class="ap-text">
-        <span class="ap-label">🎧 {bi("语音播报", "Listen")}</span>
-        <span class="ap-sub">{bi("通勤路上用耳朵看简报", "Catch the digest on your commute")}</span>
+        <span class="ap-label">🎧 语音播报</span>
+        <span class="ap-sub">通勤路上用耳朵听行业简报</span>
       </div>
       <audio controls preload="none" src="{base}audio/{date_str}.mp3" data-date="{date_str}"></audio>
     </div>"""
@@ -1067,38 +1030,29 @@ def build_podcast_cta(base: str) -> str:
     <div style="text-align:center; margin-top:20px;">
       <div class="podcast-cta-row">
         <a class="podcast-cta primary" href="{XIAOYUZHOU_URL}" target="_blank" rel="noopener">
-          🎧 {bi("在小宇宙收听", "Listen on Xiaoyuzhou")}
+          🎧 🎧 在小宇宙收听
         </a>
         <a class="podcast-cta" href="{base}podcast.xml" target="_blank" rel="noopener">
-          {bi("更多播放器 / RSS", "More apps / RSS")}
+          更多播放器 / RSS
         </a>
       </div>
       <div class="podcast-hint">
-        {bi("用 Apple 播客 / Pocket Casts 的朋友可添加订阅源：", "On Apple Podcasts / Pocket Casts, add this feed:")}
+        用 Apple 播客 / Pocket Casts 的朋友可添加订阅源：
         <code>{feed_url}</code>
-        <a href="#" data-copy-feed="{feed_url}" style="margin-left:8px;">{bi("复制", "Copy")}</a>
+        <a href="#" data-copy-feed="{feed_url}" style="margin-left:8px;">复制</a>
       </div>
     </div>"""
 
 
-def render_digest_dual(zh_digest: dict, en_digest: dict | None) -> str:
-    """Render the zh body; if an en digest exists, also render an en body.
-
-    When both exist they're wrapped in data-lang-content blocks toggled by CSS.
-    When only zh exists it's rendered once, always visible (graceful fallback
-    for the historical digests that have no English version)."""
-    zh_body = build_digest_body(zh_digest, "zh")
-    if en_digest and en_digest.get("categories"):
-        en_body = build_digest_body(en_digest, "en")
-        return (f'<div data-lang-content="zh">{zh_body}</div>'
-                f'<div data-lang-content="en">{en_body}</div>')
-    return zh_body
+def render_digest_dual(zh_digest: dict, en_digest: dict | None = None) -> str:
+    """Render the digest body (Chinese only)."""
+    return build_digest_body(zh_digest, "zh")
 
 
 def weekday_of(date_str: str, lang: str = "zh") -> str:
     try:
         idx = datetime.strptime(date_str, "%Y-%m-%d").weekday()
-        return (WEEKDAYS_EN if lang == "en" else WEEKDAYS)[idx]
+        return WEEKDAYS[idx]
     except Exception:
         return ""
 
@@ -1120,10 +1074,10 @@ def state_script(dates: list[str], current: str | None,
 
 def build_day_html(date_str: str, digest: dict, dates: list[str],
                    prev_date: str | None, next_date: str | None,
-                   en_digest: dict | None = None, has_audio: bool = False) -> str:
-    weekday = bi(f"{weekday_of(date_str)} · {date_str}",
-                 f"{weekday_of(date_str, 'en')} · {date_str}")
-    title = bi("AI 每日简报", "AI Daily Digest")
+                   en_digest=None, has_audio=False) -> str:
+    weekday = f"{weekday_of(date_str)} · {date_str}"
+                   # removed
+    title = "电梯行业日报"
     audio_html = build_audio_player(date_str, "../") if has_audio else ""
     body = f"""
     <div class="container">
@@ -1132,7 +1086,7 @@ def build_day_html(date_str: str, digest: dict, dates: list[str],
         <h1>{title}</h1>
       </div>
       {audio_html}
-      {render_digest_dual(digest, en_digest)}
+      {render_digest_dual(digest)}
       <div class="day-nav">
         {f'<a class="nav-btn" href="{prev_date}.html">← {prev_date}</a>' if prev_date else '<span></span>'}
         {f'<a class="nav-btn" href="{next_date}.html">{next_date} →</a>' if next_date else '<span></span>'}
@@ -1140,8 +1094,8 @@ def build_day_html(date_str: str, digest: dict, dates: list[str],
     </div>"""
 
     return PAGE_TEMPLATE.format(
-        title=f"AI Daily Digest · {date_str}",
-        description=f"AI领域{date_str}每日简报，涵盖行业新闻、重要论文与开源项目。",
+        title=f"电梯行业日报 · {date_str}",
+        description=f"电梯行业{date_str}每日简报，涵盖安全事故、政策标准、老旧改造与企业动态。",
         css=CSS,
         header=HEADER_HTML.format(base="../", repo=REPO_URL),
         body=body,
@@ -1259,8 +1213,8 @@ def build_trends_html(trends: list, window: int) -> str:
     return f"""
       <div class="trends">
         <div class="trends-head">
-          <h2>{bi(f"🔥 近 {window} 天热点", f"🔥 Hot picks · last {window} days")}</h2>
-          <span class="sub">{bi("近期高频出现的模型 / 产品 / 项目 · 点击搜索", "Models / products mentioned most · click to search")}</span>
+          <h2>🔥 近 {window} 天热点</h2>
+          <span class="sub">近期高频出现的话题/公司 · 点击搜索</span>
         </div>
         <div class="trend-tags">{tags}</div>
       </div>"""
@@ -1268,7 +1222,7 @@ def build_trends_html(trends: list, window: int) -> str:
 
 def build_index_html(dates: list[str], latest_digest: dict,
                      trends_html: str = "",
-                     latest_en_digest: dict | None = None,
+                     
                      audio_dates: set | None = None) -> str:
     latest = dates[-1] if dates else ""
     audio_dates = audio_dates or set()
@@ -1279,7 +1233,7 @@ def build_index_html(dates: list[str], latest_digest: dict,
         badge = (f'<div class="latest-badge">{bi("最新", "Latest")}</div>'
                  if i == 0 else "")
         mic = '<span class="audio-badge" title="有语音播报">🎧</span>' if d in audio_dates else ""
-        weekday_cell = bi(weekday_of(d), weekday_of(d, "en"))
+        weekday_cell = weekday_of(d)
         cards += f"""
         <a class="date-card" href="daily/{d}.html">
           <div class="date-label">{d}{mic}</div>
@@ -1289,21 +1243,20 @@ def build_index_html(dates: list[str], latest_digest: dict,
 
     latest_section = ""
     if latest_digest:
-        latest_label = bi(f"📅 最新一期 · {latest} {weekday_of(latest)}",
-                          f"📅 Latest · {latest} {weekday_of(latest, 'en')}")
+        latest_label = f"📅 最新一期 · {latest} {weekday_of(latest)}"
         latest_audio = build_audio_player(latest, "") if latest in audio_dates else ""
         latest_section = f"""
       <div class="section-title">{latest_label}</div>
       {latest_audio}
-      {render_digest_dual(latest_digest, latest_en_digest)}"""
+      {render_digest_dual(latest_digest)}"""
 
     podcast_cta = build_podcast_cta("") if audio_dates else ""
 
     body = f"""
     <div class="container">
       <div class="hero">
-        <h1>AI Daily Digest</h1>
-        <p>{bi("每天 5 分钟 · 掌握 AI 领域最新动态 · 全自动采集 · 智能筛选", "5 minutes a day · stay on top of AI · auto-collected · smartly curated")}</p>
+        <h1>电梯行业日报</h1>
+        <p>{bi("每天 3 分钟 · 掌握电梯行业最新动态 · 全自动采集 · 智能筛选", "5 minutes a day · stay on top of AI · auto-collected · smartly curated")}</p>
         <div class="stats">
           <div class="stat"><div class="num">{len(dates)}</div><div class="lbl">{bi("期日报", "issues")}</div></div>
           <div class="stat"><div class="num">12+</div><div class="lbl">{bi("数据源", "sources")}</div></div>
@@ -1318,8 +1271,8 @@ def build_index_html(dates: list[str], latest_digest: dict,
     </div>"""
 
     return PAGE_TEMPLATE.format(
-        title="AI Daily Digest · AI 领域每日简报",
-        description="AI Daily Digest 每日自动采集 AI 领域最新资讯，涵盖行业新闻、重要论文与开源项目。",
+        title="电梯行业日报 · Elevator Daily Digest",
+        description="电梯行业日报每日自动采集电梯行业最新资讯，涵盖安全事故、政策标准、老旧改造与企业动态。",
         css=CSS,
         header=HEADER_HTML.format(base="", repo=REPO_URL),
         body=body,
@@ -1330,19 +1283,10 @@ def build_index_html(dates: list[str], latest_digest: dict,
 
 
 def build_search_index(parsed_by_date: dict, parsed_by_date_en: dict | None = None) -> list:
-    """Flat list of every item for client-side search.
-
-    English fields (title_en/desc_en/cat_en) are attached positionally when an
-    English digest exists for that date (the en version is structurally
-    identical, so item ordering lines up)."""
-    parsed_by_date_en = parsed_by_date_en or {}
+    """Flat list of every item for client-side search."""
     index = []
     for date_str, digest in parsed_by_date.items():
-        en_digest = parsed_by_date_en.get(date_str)
-        en_cats = en_digest["categories"] if en_digest else []
         for ci, cat in enumerate(digest["categories"]):
-            en_cat = en_cats[ci] if ci < len(en_cats) else None
-            en_items = en_cat["items"] if en_cat else []
             for ii, item in enumerate(cat["items"]):
                 entry = {
                     "date": date_str,
@@ -1351,11 +1295,6 @@ def build_search_index(parsed_by_date: dict, parsed_by_date_en: dict | None = No
                     "cat": cat["name"],
                     "stars": item["star_count"],
                 }
-                if en_cat:
-                    entry["cat_en"] = en_cat["name"]
-                if ii < len(en_items):
-                    entry["title_en"] = en_items[ii]["title"]
-                    entry["desc_en"] = en_items[ii]["desc"]
                 index.append(entry)
     # newest first
     index.sort(key=lambda x: x["date"], reverse=True)
@@ -1393,7 +1332,7 @@ def _mp3_meta(path: Path):
     return size, duration
 
 
-PODCAST_DESC = "每天 5 分钟，用耳朵掌握 AI 领域最新动态。全自动采集 · 智能筛选 · 语音播报。"
+PODCAST_DESC = "每天 3 分钟，用耳朵掌握电梯行业最新动态。全自动采集 · 智能筛选 · 语音播报。"
 
 
 def build_podcast_xml(audio_dates_desc: list[str], parsed_by_date: dict,
@@ -1414,7 +1353,7 @@ def build_podcast_xml(audio_dates_desc: list[str], parsed_by_date: dict,
         else:
             notes = parsed_by_date.get(d, {}).get("observation", "")
         notes = notes.strip()[:1800]
-        title = f"AI 每日简报 · {d} {weekday_of(d)}"
+        title = f"电梯行业日报 · {d} {weekday_of(d)}"
         dur_tag = f"\n      <itunes:duration>{duration}</itunes:duration>" if duration else ""
         items.append(f"""    <item>
       <title>{xml_escape(title)}</title>
@@ -1454,7 +1393,7 @@ def build_podcast_xml(audio_dates_desc: list[str], parsed_by_date: dict,
 def build_shownotes(digest: dict, date_str: str) -> str:
     """Plain-text episode description, ready to paste into 小宇宙 Show Notes."""
     lines = [
-        f"AI 每日简报 · {date_str} {weekday_of(date_str)}",
+        f"电梯行业日报 · {date_str} {weekday_of(date_str)}",
         "",
         "🎧 每天 5 分钟，用耳朵掌握 AI 领域最新动态。全自动采集 · DeepSeek 智能筛选。",
         "",
@@ -1540,7 +1479,7 @@ def build_creator_page(audio_dates_desc: list[str], parsed_by_date: dict) -> str
     rows = ""
     for d in audio_dates_desc:
         digest = parsed_by_date.get(d, {"categories": [], "observation": ""})
-        title = f"AI 每日简报 · {d} {weekday_of(d)}"
+        title = f"电梯行业日报 · {d} {weekday_of(d)}"
         notes = build_shownotes(digest, d)
         mp3 = f"audio/{d}.mp3"
         rows += f"""
@@ -1583,37 +1522,30 @@ def generate_site(root: Path | None = None) -> None:
     audio_dates = {d for d in dates if (docs_audio_dir / f"{d}.mp3").exists()}
 
     parsed_by_date = {}
-    parsed_by_date_en = {}
     for md_file in md_files:
         date_str = md_file.stem
         parsed_by_date[date_str] = parse_digest(md_file.read_text(encoding="utf-8"))
-        en_file = daily_dir / f"{date_str}.en.md"
-        if en_file.exists():
-            parsed_by_date_en[date_str] = parse_digest(en_file.read_text(encoding="utf-8"))
 
     for i, date_str in enumerate(dates):
         digest = parsed_by_date[date_str]
         prev_date = dates[i - 1] if i > 0 else None
         next_date = dates[i + 1] if i < len(dates) - 1 else None
         html = build_day_html(date_str, digest, dates, prev_date, next_date,
-                              en_digest=parsed_by_date_en.get(date_str),
                               has_audio=date_str in audio_dates)
         (docs_daily_dir / f"{date_str}.html").write_text(html, encoding="utf-8")
 
     # Index with latest digest inline + trending hot words
     latest_digest = parsed_by_date[dates[-1]] if dates else {}
-    latest_en_digest = parsed_by_date_en.get(dates[-1]) if dates else None
     trend_window = 7
     trends = compute_trends(parsed_by_date, dates, window=trend_window)
     trends_html = build_trends_html(trends, trend_window)
     (docs_dir / "index.html").write_text(
-        build_index_html(dates, latest_digest, trends_html, latest_en_digest,
-                         audio_dates),
+        build_index_html(dates, latest_digest, trends_html, audio_dates=audio_dates),
         encoding="utf-8")
 
-    # Search index
+    # Search index (Chinese only)
     (docs_dir / "search-index.json").write_text(
-        json.dumps(build_search_index(parsed_by_date, parsed_by_date_en),
+        json.dumps(build_search_index(parsed_by_date),
                    ensure_ascii=False),
         encoding="utf-8")
 
@@ -1631,7 +1563,7 @@ def generate_site(root: Path | None = None) -> None:
     # 404 → back to index
     (docs_dir / "404.html").write_text(
         '<!DOCTYPE html><meta charset="UTF-8">'
-        '<meta http-equiv="refresh" content="0;url=/ai-daily-digest/index.html">',
+        '<meta http-equiv="refresh" content="0;url=/index.html">',
         encoding="utf-8")
 
     print(f"Site generated → {docs_dir}")

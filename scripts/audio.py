@@ -1,6 +1,7 @@
 """
-Voice broadcast: turn a daily digest into a natural spoken script (DeepSeek)
-and synthesize it to an MP3 with edge-tts (free Microsoft neural voices).
+Voice broadcast: turn an elevator industry daily digest into a natural spoken
+script (DeepSeek) and synthesize it to an MP3 with edge-tts (free Microsoft
+neural voices).
 
 Designed for commute listening: the MP3 is hosted under docs/audio/ and also
 surfaced via a podcast RSS feed, so listeners can subscribe in any podcast app.
@@ -18,13 +19,13 @@ from generate_site import parse_digest, WEEKDAYS
 # News-anchor style zh voice; override with AUDIO_VOICE if desired.
 DEFAULT_VOICE = "zh-CN-YunyangNeural"
 
-NARRATION_SYSTEM = """你是一档 AI 行业每日播客的主播，要把书面简报改写成自然、口语化的播报稿，供听众在通勤路上收听。
+NARRATION_SYSTEM = """你是一档电梯行业每日播客的主播，要把书面简报改写成自然、口语化的播报稿，供听众在通勤路上收听。
 
 要求：
 1. 纯口语，像电台主播在讲话，不要任何 Markdown、星号、链接、"来源"、"重要性 五星" 这类书面元素。
 2. 开头一句问候并报出日期，再用一两句话概括今天的看点；中间按主题自然串讲重点条目（不要逐条机械念，可合并同类、加入过渡词）；结尾用"今日观察"作为总结性的收尾，并道别（如"我们明天见"）。
-3. 专有名词（公司名、模型名等）保留英文原文，其余用中文；数字、英文缩写要写成适合朗读的形式。
-4. 控制在 600-1000 字，节奏明快，信息密度适中，适合 4-6 分钟收听。
+3. 专有名词（公司名、品牌名等）保留英文原文，其余用中文；数字、英文缩写要写成适合朗读的形式。
+4. 控制在 400-800 字，节奏明快，信息密度适中，适合 3-5 分钟收听。
 5. 只输出播报稿正文，不要加任何标题、小节名或解释。"""
 
 
@@ -49,7 +50,7 @@ def _deepseek_script(zh_markdown: str, date_str: str) -> str | None:
                 "messages": [
                     {"role": "system", "content": NARRATION_SYSTEM},
                     {"role": "user", "content":
-                        f"今天是 {date_str}。请把下面的简报改写成播报稿：\n\n{zh_markdown}"},
+                        f"今天是 {date_str}。请把下面的电梯行业简报改写成播报稿：\n\n{zh_markdown}"},
                 ],
                 "temperature": 0.6,
                 "max_tokens": 3000,
@@ -75,7 +76,7 @@ def _weekday(date_str: str) -> str:
 def _fallback_script(zh_markdown: str, date_str: str) -> str:
     """Deterministic spoken script built from the parsed digest (no LLM)."""
     digest = parse_digest(zh_markdown)
-    parts = [f"AI 每日简报，{_weekday(date_str)}，{date_str}。以下是今天的重点。"]
+    parts = [f"电梯行业日报，{_weekday(date_str)}，{date_str}。以下是今天的重点。"]
     for cat in digest["categories"]:
         items = cat["items"]
         if not items:
@@ -88,7 +89,7 @@ def _fallback_script(zh_markdown: str, date_str: str) -> str:
             parts.append(line.rstrip("。") + "。")
     if digest["observation"]:
         parts.append("今日观察。" + digest["observation"])
-    parts.append("以上就是今天的 AI 简报，我们明天见。")
+    parts.append("以上就是今天的电梯行业简报，我们明天见。")
     return "\n".join(parts)
 
 
