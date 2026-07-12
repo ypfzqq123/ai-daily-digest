@@ -443,6 +443,7 @@ t.lang-toggle { padding: 0 12px; font-size: 13px; font-weight: 600; min-width: 4
 .item-card:hover { border-color: var(--border-strong); }
 .item-title { font-size: 15px; font-weight: 600; color: var(--text); line-height: 1.5; margin-bottom: 8px; }
 .item-desc { font-size: 14px; color: var(--text-muted); margin-bottom: 14px; line-height: 1.6; }
+.item-summary { font-size: 14px; color: var(--text-muted); margin-bottom: 10px; line-height: 1.7; }
 .item-meta { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
 .stars { font-size: 13px; color: #e3b341; letter-spacing: 1px; }
 .item-value {
@@ -563,10 +564,10 @@ JS = """
       loadIndex().then(function (idx) {
         var en = window.CUR_LANG === 'ja';  // ja version
         function fTitle(h) { return (en && h.title_ja) ? h.title_ja : h.title; }
-        function fDesc(h) { return (en && h.desc_ja) ? h.desc_ja : h.desc; }
+        function fSummary(h) { return (en && h.summary_ja) ? h.summary_ja : (h.summary || ''); }
         function fCat(h) { return (en && h.cat_ja) ? h.cat_ja : h.cat; }
         var hits = idx.filter(function (it) {
-          return (fTitle(it) + ' ' + fDesc(it) + ' ' + it.title + ' ' + it.desc)
+          return (fTitle(it) + ' ' + fSummary(it) + ' ' + it.title + ' ' + (it.summary || ''))
             .toLowerCase().indexOf(q) !== -1;
         }).slice(0, 25);
         if (!hits.length) {
@@ -587,12 +588,11 @@ JS = """
     });
   }
 
-  // ── Filters (category tabs + star toggle), scoped per digest ──
+  // ── Filters (category tabs), scoped per digest ──
   document.querySelectorAll('.filter-bar').forEach(function (bar) {
     var scope = bar.closest('.digest-scope') || document;
     var tabs = bar.querySelectorAll('.tab');
-    var starToggle = bar.querySelector('.star-toggle');
-    var curCat = 'all', starsOnly = false;
+    var curCat = 'all';
 
     function apply() {
       scope.querySelectorAll('.category').forEach(function (catEl) {
@@ -600,8 +600,7 @@ JS = """
         var catMatch = (curCat === 'all') || (ct === curCat);
         var visible = 0;
         catEl.querySelectorAll('.item-card').forEach(function (it) {
-          var stars = parseInt(it.getAttribute('data-stars') || '0', 10);
-          var show = catMatch && (!starsOnly || stars >= 4);
+          var show = catMatch;
           it.style.display = show ? '' : 'none';
           if (show) visible++;
         });
@@ -623,13 +622,6 @@ JS = """
         apply();
       });
     });
-    if (starToggle) {
-      starToggle.addEventListener('click', function () {
-        starsOnly = !starsOnly;
-        starToggle.classList.toggle('active', starsOnly);
-        apply();
-      });
-    }
   });
 
   // ── Keyboard navigation (day pages) ──
@@ -909,10 +901,8 @@ def parse_digest(text: str) -> dict:
         if item_match:
             current_item = {
                 "title": item_match.group(1).strip(),
-                "desc": item_match.group(2).strip(),
-                "stars": "",
-                "star_count": 0,
-                "value": "",
+                "summary": "",
+                "date": "",
                 "sources": [],
             }
             current_cat["items"].append(current_item)
@@ -923,9 +913,16 @@ def parse_digest(text: str) -> dict:
 
         stripped = line.strip()
 
-        val_match = re.match(r'^-\s+核心价值[：:]\s*(.+)', stripped)
-        if val_match:
-            current_item["value"] = val_match.group(1).strip()
+        # AI摘要 / AI要約
+        summary_match = re.match(r'^-\s+(?:AI摘要|AI要約)[：:]\s*(.+)', stripped)
+        if summary_match:
+            current_item["summary"] = summary_match.group(1).strip()
+            continue
+
+        # 日期 / 日付
+        date_match = re.match(r'^-\s+(?:日期|日付)[：:]\s*(.+)', stripped)
+        if date_match:
+            current_item["date"] = date_match.group(1).strip()
             continue
 
         src_match = re.match(r'^-\s+来源[：:]\s*(.+)', stripped)
@@ -954,29 +951,30 @@ def build_item_html(item: dict) -> str:
     sources_html = ""
     if item["sources"]:
         links = " · ".join(
-            f'<a href="{s["url"]}" target="_blank">{s["name"]}</a>'
+            f'<a href="{s["url"]}" target="_blank">{s["url"]}</a>（{s["name"]}）'
             for s in item["sources"]
         )
-        sources_html = f'<div class="item-sources">{links}</div>'
+        sources_html = f'<div class="item-sources">来源：{links}</div>'
 
-    value_html = f'<span class="item-value">{item["value"]}</span>' if item["value"] else ""
-    stars_html = f'<span class="stars">{item["stars"]}</span>' if item["stars"] else ""
+    summary_html = ""
+    if item["summary"]:
+        summary_html = f'<div class="item-summary">AI摘要：{item["summary"]}</div>'
+
+    date_html = f'<div class="item-date">日期：{item["date"]}</div>' if item["date"] else ""
 
     return f"""
-    <div class="item-card" data-stars="{item['star_count']}">
+    <div class="item-card">
       <div class="item-title">{item["title"]}</div>
-      {"<div class='item-desc'>" + item["desc"] + "</div>" if item["desc"] else ""}
+      {summary_html}
       <div class="item-meta">
-        {stars_html}
-        {value_html}
         {sources_html}
+        {date_html}
       </div>
     </div>"""
 
 
 def build_filter_bar(present_types: set, lang: str = "zh") -> str:
     labels = CAT_LABELS
-    star_label = "★ 只看重点 (4+)"
     tabs = ""
     for key, label in labels:
         if key != "all" and key not in present_types:
@@ -986,7 +984,6 @@ def build_filter_bar(present_types: set, lang: str = "zh") -> str:
     return f"""
     <div class="filter-bar">
       {tabs}
-      <span class="star-toggle">{star_label}</span>
     </div>"""
 
 
@@ -1201,7 +1198,7 @@ def compute_trends(parsed_by_date: dict, dates: list[str], window: int = 7, top:
             continue
         for cat in digest["categories"]:
             for item in cat["items"]:
-                text = f"{item['title']} {item['desc']}"
+                text = f"{item['title']} {item.get('summary', '')}"
                 found = set()
                 for m in _VER_RE.findall(text):
                     t = _strip_stoptokens(m.strip())
@@ -1340,15 +1337,14 @@ def build_search_index(parsed_by_date: dict, parsed_by_date_ja: dict | None = No
                 entry = {
                     "date": date_str,
                     "title": item["title"],
-                    "desc": item["desc"],
+                    "summary": item.get("summary", ""),
                     "cat": cat["name"],
-                    "stars": item["star_count"],
                 }
                 if ja_cat:
                     entry["cat_ja"] = ja_cat["name"]
                 if ii < len(ja_items):
                     entry["title_ja"] = ja_items[ii]["title"]
-                    entry["desc_ja"] = ja_items[ii]["desc"]
+                    entry["summary_ja"] = ja_items[ii].get("summary", "")
                 index.append(entry)
     # newest first
     index.sort(key=lambda x: x["date"], reverse=True)
@@ -1457,8 +1453,9 @@ def build_shownotes(digest: dict, date_str: str) -> str:
             continue
         lines.append(f"{cat['emoji']} {cat['name']}".strip())
         for it in cat["items"]:
-            desc = f"：{it['desc']}" if it["desc"] else ""
-            lines.append(f"· {it['title']}{desc}")
+            lines.append(f"· {it['title']}")
+            if it.get("summary"):
+                lines.append(f"  {it['summary']}")
             if it["sources"]:
                 lines.append("  来源：" + " / ".join(s["url"] for s in it["sources"]))
         lines.append("")
