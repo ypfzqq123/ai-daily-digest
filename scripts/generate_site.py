@@ -197,10 +197,10 @@ a:hover { text-decoration: underline; }
 }
 .theme-toggle, .lang-toggle { width: 34px; }
 .theme-toggle:hover, .lang-toggle:hover { border-color: #58a6ff; }
-n	/* ── Language content toggle ── */
+	/* ── Language content toggle ── */
 	html[data-lang="ja"] [data-lang-content="zh"] { display: none; }
 	html[data-lang="zh"] [data-lang-content="ja"] { display: none; }
-t.lang-toggle { padding: 0 12px; font-size: 13px; font-weight: 600; min-width: 42px; }
+.lang-toggle { padding: 0 12px; font-size: 13px; font-weight: 600; min-width: 42px; }
 
 
 /* ── Hot words / trends ── */
@@ -769,14 +769,15 @@ JS = """
 HEADER_HTML = """
 <div id="progressBar"></div>
 <header class="site-header">
-  <div class="logo"><a href="{base}index.html">⚡ AI <span>Daily</span> Digest</a></div>
+  <div class="logo"><a href="{base}index.html">⚡ AI <span>Weekly</span> Digest</a></div>
   <div class="header-tools">
     <div class="search-box">
-      <input id="searchInput" type="text" placeholder="搜索全部日报…" autocomplete="off">
+      <input id="searchInput" type="text" placeholder="搜索全部周报…" autocomplete="off">
       <div id="searchResults" class="search-results"></div>
     </div>
     <input id="datePicker" type="date" class="date-picker" aria-label="选择日期">
     <button id="themeToggle" class="theme-toggle" aria-label="切换主题" title="切换浅色/深色">🌙</button>
+    <button id="langToggle" class="lang-toggle" aria-label="切换语言" title="中/日切换">日</button>
     <nav>
       <a href="{base}index.html"><span data-lang-content="zh">归档</span><span data-lang-content="ja">アーカイブ</span></a>
       <a href="{repo}" target="_blank">GitHub</a>
