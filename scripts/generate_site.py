@@ -739,9 +739,9 @@ JS = """
       var date = audio.getAttribute('data-date') || '';
       try {
         navigator.mediaSession.metadata = new MediaMetadata({
-          title: 'AI 每日简报 · ' + date,
+          title: 'AI 周报 · ' + date,
           artist: 'AI Daily Digest',
-          album: 'AI 每日简报',
+          album: 'AI 周报',
           artwork: [{ src: BASE + 'podcast-cover.png', sizes: '1400x1400', type: 'image/png' }]
         });
       } catch (e) {}
@@ -788,7 +788,7 @@ HEADER_HTML = """
 FOOTER_HTML = """
 <button id="backToTop" aria-label="回到顶部">↑</button>
 <footer class="site-footer">
-  <span data-lang-content="zh">© 电梯行业日报 · 全自动采集 · DeepSeek 智能筛选 · 每日更新</span>
+  <span data-lang-content="zh">© 电梯行业周报 · 全自动采集 · DeepSeek 智能筛选 · 每周更新</span>
   
 </footer>
 """
@@ -1135,8 +1135,8 @@ def build_day_html(date_str: str, digest: dict, dates: list[str],
     </div>"""
 
     return PAGE_TEMPLATE.format(
-        title=f"电梯行业日报 · {date_str}",
-        description=f"电梯行业{date_str}简报，涵盖安全事故、政策标准、老旧改造与企业动态。",
+        title=f"电梯行业周报 · {date_str}",
+        description=f"电梯行业{date_str}周报，涵盖政策标准、老旧改造、企业动态与行业综合。",
         css=CSS,
         header=HEADER_HTML.format(base="../", repo=REPO_URL),
         body=body,
@@ -1262,8 +1262,7 @@ def build_trends_html(trends: list, window: int) -> str:
 
 
 def build_index_html(dates: list[str], latest_digest: dict,
-                     trends_html: str = "",
-                     
+
                      audio_dates: set | None = None, ja_digest: dict | None = None) -> str:
     latest = dates[-1] if dates else ""
     audio_dates = audio_dates or set()
@@ -1291,29 +1290,26 @@ def build_index_html(dates: list[str], latest_digest: dict,
       {latest_audio}
       {render_digest_dual(latest_digest, ja_digest)}"""
 
-    podcast_cta = build_podcast_cta("") if audio_dates else ""
-
     body = f"""
     <div class="container">
       <div class="hero">
-        <h1>电梯行业日报</h1>
-        <p>{bi("每天 3 分钟 · 掌握电梯行业最新动态 · 全自动采集 · 智能筛选", "5 minutes a day · stay on top of AI · auto-collected · smartly curated")}</p>
+        <h1>电梯行业周报</h1>
+        <p>{bi("每周一览 · 掌握电梯行业最新动态 · 全自动采集 · 智能筛选", "Weekly digest · stay on top of elevator industry · auto-collected · smartly curated")}</p>
         <div class="stats">
-          <div class="stat"><div class="num">{len(dates)}</div><div class="lbl">{bi("期日报", "issues")}</div></div>
+          <div class="stat"><div class="num">{len(dates)}</div><div class="lbl">{bi("期周报", "issues")}</div></div>
           <div class="stat"><div class="num">12+</div><div class="lbl">{bi("数据源", "sources")}</div></div>
-          <div class="stat"><div class="num">{bi("每日", "Daily")}</div><div class="lbl">{bi("自动更新", "auto-updated")}</div></div>
+          <div class="stat"><div class="num">{bi("每周", "Weekly")}</div><div class="lbl">{bi("自动更新", "auto-updated")}</div></div>
         </div>
-        {podcast_cta}
+        
       </div>
       {latest_section}
       <div class="section-title">{bi("🗂 历史归档", "🗂 アーカイブ")}</div>
       <div class="date-grid">{cards}</div>
-      {trends_html}
     </div>"""
 
     return PAGE_TEMPLATE.format(
-        title="电梯行业日报 · Elevator Daily Digest",
-        description="电梯行业日报每日自动采集电梯行业最新资讯，涵盖安全事故、政策标准、老旧改造与企业动态。",
+        title="电梯行业周报 · Elevator Weekly Digest",
+        description="电梯行业周报自动采集电梯行业最新资讯，涵盖政策标准、老旧改造、企业动态与行业综合。",
         css=CSS,
         header=HEADER_HTML.format(base="", repo=REPO_URL),
         body=body,
@@ -1443,7 +1439,7 @@ def build_podcast_xml(audio_dates_desc: list[str], parsed_by_date: dict,
 def build_shownotes(digest: dict, date_str: str) -> str:
     """Plain-text episode description, ready to paste into 小宇宙 Show Notes."""
     lines = [
-        f"电梯行业日报 · {date_str} {weekday_of(date_str)}",
+        f"电梯行业周报 · {date_str} {weekday_of(date_str)}",
         "",
         "🎧 每天 5 分钟，用耳朵掌握 AI 领域最新动态。全自动采集 · DeepSeek 智能筛选。",
         "",
@@ -1590,14 +1586,11 @@ def generate_site(root: Path | None = None) -> None:
                               has_audio=date_str in audio_dates)
         (docs_daily_dir / f"{date_str}.html").write_text(html, encoding="utf-8")
 
-    # Index with latest digest inline + trending hot words
+    # Index with latest digest inline
     latest_digest = parsed_by_date[dates[-1]] if dates else {}
     latest_ja_digest = parsed_by_date_ja.get(dates[-1]) if dates else None
-    trend_window = 7
-    trends = compute_trends(parsed_by_date, dates, window=trend_window)
-    trends_html = build_trends_html(trends, trend_window)
     (docs_dir / "index.html").write_text(
-        build_index_html(dates, latest_digest, trends_html, audio_dates=audio_dates, ja_digest=latest_ja_digest),
+        build_index_html(dates, latest_digest, audio_dates=audio_dates, ja_digest=latest_ja_digest),
         encoding="utf-8")
 
     # Search index (Chinese only)

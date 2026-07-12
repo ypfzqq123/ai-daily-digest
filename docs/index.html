@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>电梯行业日报 · Elevator Daily Digest</title>
-  <meta name="description" content="电梯行业日报每日自动采集电梯行业最新资讯，涵盖安全事故、政策标准、老旧改造与企业动态。">
+  <title>电梯行业周报 · Elevator Weekly Digest</title>
+  <meta name="description" content="电梯行业周报自动采集电梯行业最新资讯，涵盖政策标准、老旧改造、企业动态与行业综合。">
 	  <script>
 	    (function () {
 	      try {
@@ -530,29 +530,14 @@ t.lang-toggle { padding: 0 12px; font-size: 13px; font-weight: 600; min-width: 4
   
     <div class="container">
       <div class="hero">
-        <h1>电梯行业日报</h1>
-        <p><span data-lang-content="zh">每天 3 分钟 · 掌握电梯行业最新动态 · 全自动采集 · 智能筛选</span><span data-lang-content="ja">5 minutes a day · stay on top of AI · auto-collected · smartly curated</span></p>
+        <h1>电梯行业周报</h1>
+        <p><span data-lang-content="zh">每周一览 · 掌握电梯行业最新动态 · 全自动采集 · 智能筛选</span><span data-lang-content="ja">Weekly digest · stay on top of elevator industry · auto-collected · smartly curated</span></p>
         <div class="stats">
-          <div class="stat"><div class="num">7</div><div class="lbl"><span data-lang-content="zh">期日报</span><span data-lang-content="ja">issues</span></div></div>
+          <div class="stat"><div class="num">7</div><div class="lbl"><span data-lang-content="zh">期周报</span><span data-lang-content="ja">issues</span></div></div>
           <div class="stat"><div class="num">12+</div><div class="lbl"><span data-lang-content="zh">数据源</span><span data-lang-content="ja">sources</span></div></div>
-          <div class="stat"><div class="num"><span data-lang-content="zh">每日</span><span data-lang-content="ja">Daily</span></div><div class="lbl"><span data-lang-content="zh">自动更新</span><span data-lang-content="ja">auto-updated</span></div></div>
+          <div class="stat"><div class="num"><span data-lang-content="zh">每周</span><span data-lang-content="ja">Weekly</span></div><div class="lbl"><span data-lang-content="zh">自动更新</span><span data-lang-content="ja">auto-updated</span></div></div>
         </div>
         
-    <div style="text-align:center; margin-top:20px;">
-      <div class="podcast-cta-row">
-        <a class="podcast-cta primary" href="" target="_blank" rel="noopener">
-          🎧 <span data-lang-content="zh">🎧 在小宇宙收听</span><span data-lang-content="ja">🎧 ポッドキャストで聴く</span>
-        </a>
-        <a class="podcast-cta" href="podcast.xml" target="_blank" rel="noopener">
-          <span data-lang-content="zh">更多播放器 / RSS</span><span data-lang-content="ja">他のアプリ / RSS</span>
-        </a>
-      </div>
-      <div class="podcast-hint">
-        <span data-lang-content="zh">用 Apple 播客 / Pocket Casts 的朋友可添加订阅源：</span><span data-lang-content="ja">Apple Podcasts / Pocket Castsをご利用の方は下記フィードを追加：</span>
-        <code>https://jimmuji.github.io/ai-daily-digest/podcast.xml</code>
-        <a href="#" data-copy-feed="https://jimmuji.github.io/ai-daily-digest/podcast.xml" style="margin-left:8px;"><span data-lang-content="zh">复制</span><span data-lang-content="ja">コピー</span></a>
-      </div>
-    </div>
       </div>
       
       <div class="section-title"><span data-lang-content="zh">📅 最新一期 · 周报 07/05-07/12</span><span data-lang-content="ja">📅 最新 · 周报 07/05-07/12</span></div>
@@ -757,19 +742,11 @@ t.lang-toggle { padding: 0 12px; font-size: 13px; font-weight: 600; min-width: 4
           <div class="date-label">周六 · 2026-07-11<span class="audio-badge" title="有语音播报">🎧</span></div>
           
         </a></div>
-      
-      <div class="trends">
-        <div class="trends-head">
-          <h2>🔥 近 7 天热点</h2>
-          <span class="sub">近期高频出现的话题/公司 · 点击搜索</span>
-        </div>
-        <div class="trend-tags"><span class="trend-tag s3" data-term="TSG 08">TSG 08<span class="cnt">6</span></span></div>
-      </div>
     </div>
   
 <button id="backToTop" aria-label="回到顶部">↑</button>
 <footer class="site-footer">
-  <span data-lang-content="zh">© 电梯行业日报 · 全自动采集 · DeepSeek 智能筛选 · 每日更新</span>
+  <span data-lang-content="zh">© 电梯行业周报 · 全自动采集 · DeepSeek 智能筛选 · 每周更新</span>
   
 </footer>
 
@@ -993,9 +970,9 @@ t.lang-toggle { padding: 0 12px; font-size: 13px; font-weight: 600; min-width: 4
       var date = audio.getAttribute('data-date') || '';
       try {
         navigator.mediaSession.metadata = new MediaMetadata({
-          title: 'AI 每日简报 · ' + date,
+          title: 'AI 周报 · ' + date,
           artist: 'AI Daily Digest',
-          album: 'AI 每日简报',
+          album: 'AI 周报',
           artwork: [{ src: BASE + 'podcast-cover.png', sizes: '1400x1400', type: 'image/png' }]
         });
       } catch (e) {}
