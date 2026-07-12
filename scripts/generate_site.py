@@ -923,15 +923,6 @@ def parse_digest(text: str) -> dict:
 
         stripped = line.strip()
 
-        star_match = re.match(r'^-\s+重要性[：:]\s*(.+)', stripped)
-        if star_match:
-            raw = star_match.group(1)
-            filled = raw.count('★')
-            empty = raw.count('☆')
-            current_item["stars"] = '★' * filled + '☆' * empty
-            current_item["star_count"] = filled
-            continue
-
         val_match = re.match(r'^-\s+核心价值[：:]\s*(.+)', stripped)
         if val_match:
             current_item["value"] = val_match.group(1).strip()

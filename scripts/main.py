@@ -155,18 +155,37 @@ def _generate_word(markdown: str, filepath: Path) -> None:
             i += 1
             continue
 
-        # 来源/出典 line - has Markdown links, render as clickable
+        # 来源/出典 line - format: 来源：URL（来源名称）
         if line.startswith('- 来源') or line.startswith('- 出典'):
             text = line[2:].strip()
-            p = doc.add_paragraph()
-            p.paragraph_format.left_indent = Inches(0.5)
-            _add_markdown_text(p, text, Pt(10), RGBColor(0x66, 0x66, 0x66))
+            # Extract source name and URL from [name](url)
+            m = re.match(r'(来源|出典)[：:]\s*\[([^\]]+)\]\(([^)]+)\)', text)
+            if m:
+                prefix = m.group(1)
+                src_name = m.group(2)
+                src_url = m.group(3)
+                p = doc.add_paragraph()
+                p.paragraph_format.left_indent = Inches(0.5)
+                # 来源：URL（名称）
+                run = p.add_run(f"{prefix}：")
+                run.font.size = Pt(10)
+                run.font.color.rgb = RGBColor(0x66, 0x66, 0x66)
+                # URL as clickable hyperlink
+                _add_hyperlink(p, src_url, src_url)
+                # （来源名称）
+                run = p.add_run(f"（{src_name}）")
+                run.font.size = Pt(10)
+                run.font.color.rgb = RGBColor(0x66, 0x66, 0x66)
+            else:
+                p = doc.add_paragraph()
+                p.paragraph_format.left_indent = Inches(0.5)
+                _add_markdown_text(p, text, Pt(10), RGBColor(0x66, 0x66, 0x66))
             i += 1
             continue
 
-        # Other metadata lines (重要性/重要度, AI摘要/AI要約, 日期/日付)
-        if any(line.startswith(p) for p in ['- 重要性', '- AI摘要', '- 日期',
-                                              '- 重要度', '- AI要約', '- 日付']):
+        # Other metadata lines (AI摘要/AI要約, 日期/日付)
+        if any(line.startswith(p) for p in ['- AI摘要', '- 日期',
+                                              '- AI要約', '- 日付']):
             text = line[2:].strip()
             p = doc.add_paragraph()
             p.paragraph_format.left_indent = Inches(0.5)
@@ -192,17 +211,11 @@ def main():
     today = datetime.now(beijing_tz)
     date_str = today.strftime("%Y-%m-%d")
 
-    # Weekly mode: run with --weekly flag, or auto-detect Monday
-    weekly = "--weekly" in sys.argv or today.weekday() == 0
-
-    if weekly:
-        # Weekly mode: fetch past 7 days, generate weekly report
-        week_end = today
-        week_start = today - timedelta(days=7)
-        week_label = f"{week_start.strftime('%Y-%m-%d')} ~ {week_end.strftime('%Y-%m-%d')}"
-        print(f"=== Elevator Weekly Digest for {week_label} ===\n")
-    else:
-        print(f"=== Elevator Daily Digest for {date_str} ===\n")
+    # Always weekly mode
+    week_end = today
+    week_start = today - timedelta(days=7)
+    week_label = f"{week_start.strftime('%Y-%m-%d')} ~ {week_end.strftime('%Y-%m-%d')}"
+    print(f"=== Elevator Weekly Digest for {week_label} ===\n")
 
     # Step 1: Fetch data
     print("[Step 1] Fetching data from sources...")
@@ -231,15 +244,13 @@ def main():
     )
     print(f"\n[Step 2] Saved raw data to {raw_file}")
 
-    # Step 3: AI summarization
-    if weekly:
-        print("\n[Step 3] Generating AI weekly summary (zh + ja)...")
-        label_for_file = f"{week_start.strftime('%Y%m%d')}-{week_end.strftime('%Y%m%d')}"
-        markdown, markdown_ja = summarize_weekly(data, week_label)
-    else:
-        print("\n[Step 3] Generating AI summary (zh + ja)...")
-        label_for_file = date_str
-        markdown, markdown_ja = summarize(data, date_str)
+    # Filter out accident/safety-incident items — 不纳入日报
+    data.pop('accident', None)
+
+    # Step 3: AI summarization (weekly)
+    print("\n[Step 3] Generating AI weekly summary (zh + ja)...")
+    label_for_file = f"{week_start.strftime('%Y%m%d')}-{week_end.strftime('%Y%m%d')}"
+    markdown, markdown_ja = summarize_weekly(data, week_label)
 
     # Step 4: Save Markdown (zh + ja)
     output_dir = Path(__file__).parent.parent / "daily"
