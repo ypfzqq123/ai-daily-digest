@@ -524,6 +524,7 @@ JS = """
 (function () {
   var BASE = window.SITE_BASE || "";
   var DATES = window.AVAILABLE_DATES || [];
+  var PH = { zh: "搜索全部周报…", ja: "すべての週報を検索…" };
 
   function esc(s) {
     return (s || "").replace(/[&<>"]/g, function (c) {
@@ -755,7 +756,7 @@ JS = """
       var url = el.getAttribute('data-copy-feed');
       var done = function () {
         var old = el.textContent;
-        el.textContent = "✓ 已{bi("复制", "コピー")}订阅链接";
+        el.textContent = "✓ 已复制订阅链接";
         setTimeout(function () { el.textContent = old; }, 1800);
       };
       if (navigator.clipboard) { navigator.clipboard.writeText(url).then(done, done); }
@@ -959,7 +960,7 @@ def build_item_html(item: dict) -> str:
 
     summary_html = ""
     if item["summary"]:
-        summary_html = f'<div class="item-summary">AI摘要：{item["summary"]}</div>'
+        summary_html = f'<div class="item-summary">{item["summary"]}</div>' if item["summary"] else ""
 
     date_html = f'<div class="item-date">日期：{item["date"]}</div>' if item["date"] else ""
 
@@ -1068,8 +1069,12 @@ def build_podcast_cta(base: str) -> str:
 
 
 def render_digest_dual(zh_digest: dict, ja_digest: dict | None = None) -> str:
-    """Render the digest body (Chinese only)."""
-    return build_digest_body(zh_digest, "zh")
+    """Render digest in both Chinese and Japanese, toggled via data-lang."""
+    zh_html = build_digest_body(zh_digest, "zh")
+    if ja_digest:
+        ja_html = build_digest_body(ja_digest, "ja")
+        return f'<div data-lang-content="zh">{zh_html}</div><div data-lang-content="ja">{ja_html}</div>'
+    return zh_html
 
 
 def weekday_of(date_str: str, lang: str = "zh") -> str:
@@ -1128,7 +1133,7 @@ def build_day_html(date_str: str, digest: dict, dates: list[str],
         <h1>{title}</h1>
       </div>
       {audio_html}
-      {render_digest_dual(digest)}
+      {render_digest_dual(digest, ja_digest)}
       <div class="day-nav">
         {f'<a class="nav-btn" href="{prev_date}.html">← {prev_date}</a>' if prev_date else '<span></span>'}
         {f'<a class="nav-btn" href="{next_date}.html">{next_date} →</a>' if next_date else '<span></span>'}
@@ -1506,7 +1511,7 @@ CREATOR_TAIL = """
 (function () {
   function flash(btn, ok) {
     var old = btn.textContent;
-    btn.textContent = ok ? '✓ 已{bi("复制", "コピー")}' : '{bi("复制", "コピー")}失败';
+    btn.textContent = ok ? '✓ 已复制' : '复制失败';
     setTimeout(function () { btn.textContent = old; }, 1600);
   }
   document.querySelectorAll('[data-copy]').forEach(function (btn) {

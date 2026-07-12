@@ -683,6 +683,7 @@ a:hover { text-decoration: underline; }
 (function () {
   var BASE = window.SITE_BASE || "";
   var DATES = window.AVAILABLE_DATES || [];
+  var PH = { zh: "搜索全部周报…", ja: "すべての週報を検索…" };
 
   function esc(s) {
     return (s || "").replace(/[&<>"]/g, function (c) {
@@ -914,7 +915,7 @@ a:hover { text-decoration: underline; }
       var url = el.getAttribute('data-copy-feed');
       var done = function () {
         var old = el.textContent;
-        el.textContent = "✓ 已{bi("复制", "コピー")}订阅链接";
+        el.textContent = "✓ 已复制订阅链接";
         setTimeout(function () { el.textContent = old; }, 1800);
       };
       if (navigator.clipboard) { navigator.clipboard.writeText(url).then(done, done); }

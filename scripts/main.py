@@ -187,6 +187,8 @@ def _generate_word(markdown: str, filepath: Path) -> None:
         if any(line.startswith(p) for p in ['- AI摘要', '- 日期',
                                               '- AI要約', '- 日付']):
             text = line[2:].strip()
+            # Strip "AI摘要：" / "AI要約：" prefix from display
+            text = re.sub(r'^(?:AI摘要|AI要約)[：:]\s*', '', text)
             p = doc.add_paragraph()
             p.paragraph_format.left_indent = Inches(0.5)
             _add_markdown_text(p, text, Pt(10), RGBColor(0x66, 0x66, 0x66))
