@@ -48,21 +48,30 @@ def _add_hyperlink(paragraph, text: str, url: str) -> None:
 
 
 def _add_markdown_text(paragraph, text: str, font_size: Pt = Pt(10), color=None) -> None:
-    """Add text with inline Markdown links converted to Word hyperlinks."""
-    pattern = re.compile(r'\[([^\]]+)\]\(([^)]+)\)')
+    """Add text with inline Markdown bold and links converted to Word formatting."""
+    # Combined pattern: **bold** or [text](url)
+    pattern = re.compile(r'\*\*(.+?)\*\*|\[([^\]]+)\]\(([^)]+)\)')
     last_end = 0
     for m in pattern.finditer(text):
-        # Add plain text before the link
+        # Add plain text before the match
         prefix = text[last_end:m.start()]
         if prefix:
             run = paragraph.add_run(prefix)
             run.font.size = font_size
             if color:
                 run.font.color.rgb = color
-        # Add the hyperlink
-        _add_hyperlink(paragraph, m.group(1), m.group(2))
+        if m.group(1) is not None:
+            # Bold: **text**
+            run = paragraph.add_run(m.group(1))
+            run.bold = True
+            run.font.size = font_size
+            if color:
+                run.font.color.rgb = color
+        else:
+            # Link: [text](url)
+            _add_hyperlink(paragraph, m.group(2), m.group(3))
         last_end = m.end()
-    # Add remaining text after the last link
+    # Add remaining text after the last match
     suffix = text[last_end:]
     if suffix:
         run = paragraph.add_run(suffix)
@@ -126,20 +135,15 @@ def _generate_word(markdown: str, filepath: Path) -> None:
             i += 1
             continue
 
-        # Item title: - **[label] description** or - **[label]**: description
-        if line.startswith('- **['):
-            rest = line[2:].strip()
-            if rest.startswith('**'):
-                rest = rest[2:]
-            if rest.endswith('**'):
-                rest = rest[:-2]
-            rest = rest.strip()
-            m = re.match(r'\[([^\]]+)\]\s*(.*)', rest)
+        # Item title: - **title**：description or legacy - **[title]**：description
+        if line.startswith('- **'):
+            content = line[2:]  # remove "- " prefix
+            m = re.match(r'\*\*\[?([^\]*]+?)\]?\*\*[：:]?\s*(.*)', content)
             if m:
-                title_text = f'[{m.group(1)}]'
-                subtitle = m.group(2)
+                title_text = m.group(1).strip()
+                subtitle = m.group(2).strip()
             else:
-                title_text = rest
+                title_text = content.strip()
                 subtitle = ''
             p = doc.add_paragraph()
             p.style = doc.styles['List Bullet']
@@ -160,21 +164,20 @@ def _generate_word(markdown: str, filepath: Path) -> None:
             i += 1
             continue
 
-        # Other metadata lines (重要性/重要度, 核心要点/ポイント, 日期/日付)
-        if any(line.startswith(p) for p in ['- 重要性', '- 核心要点', '- 日期',
-                                              '- 重要度', '- ポイント', '- 日付']):
+        # Other metadata lines (重要性/重要度, AI摘要/AI要約, 日期/日付)
+        if any(line.startswith(p) for p in ['- 重要性', '- AI摘要', '- 日期',
+                                              '- 重要度', '- AI要約', '- 日付']):
             text = line[2:].strip()
             p = doc.add_paragraph()
             p.paragraph_format.left_indent = Inches(0.5)
-            run = p.add_run(text)
-            run.font.size = Pt(10)
-            run.font.color.rgb = RGBColor(0x66, 0x66, 0x66)
+            _add_markdown_text(p, text, Pt(10), RGBColor(0x66, 0x66, 0x66))
             i += 1
             continue
 
         # Observation paragraph text
         if line and not line.startswith('#'):
-            p = doc.add_paragraph(line)
+            p = doc.add_paragraph()
+            _add_markdown_text(p, line, Pt(11))
             i += 1
             continue
 

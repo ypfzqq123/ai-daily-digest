@@ -6,7 +6,7 @@
 
 全自动采集 · AI 智能筛选与总结 · 中英双语 · 重要性评分 · 语音播报 · 每日定时发布
 
-### 👉 [**在线阅读：jimmuji.github.io/ai-daily-digest**](https://jimmuji.github.io/ai-daily-digest/) 👈
+### 👉 [**在线阅读：ypfzqq123.github.io/ai-daily-digest**](https://ypfzqq123.github.io/ai-daily-digest/) 👈
 
 [![Visit Site](https://img.shields.io/badge/🌐_在线网站-访问-2ea043?style=for-the-badge)](https://jimmuji.github.io/ai-daily-digest/)
 [![Podcast](https://img.shields.io/badge/🎧_在小宇宙收听-播客-9333ea?style=for-the-badge)](https://www.xiaoyuzhoufm.com/podcast/6a325e149357568efe4741ef)
@@ -15,7 +15,7 @@
 ![GitHub last commit](https://img.shields.io/github/last-commit/Jimmuji/ai-daily-digest)
 ![GitHub stars](https://img.shields.io/github/stars/Jimmuji/ai-daily-digest?style=social)
 
-[**🌐 在线网站**](https://jimmuji.github.io/ai-daily-digest/) · [**🎧 播客订阅**](https://www.xiaoyuzhoufm.com/podcast/6a325e149357568efe4741ef) · [**📖 日报存档**](daily/) · [**⚙️ 快速部署**](#-快速开始) · [**💡 设计理念**](#-为什么做这个)
+[**🌐 在线网站**](https://ypfzqq123.github.io/ai-daily-digest/) · [**🎧 播客订阅**](https://www.xiaoyuzhoufm.com/podcast/6a325e149357568efe4741ef) · [**📖 日报存档**](daily/) · [**⚙️ 快速部署**](#-快速开始) · [**💡 设计理念**](#-为什么做这个)
 
 </div>
 
